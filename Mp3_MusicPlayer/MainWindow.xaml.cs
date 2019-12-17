@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Mp3_MusicPlayer
+namespace MP3_MusicPlayer
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

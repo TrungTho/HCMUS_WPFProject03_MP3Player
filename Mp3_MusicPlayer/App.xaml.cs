@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Mp3_MusicPlayer
+namespace MP3_MusicPlayer
 {
     /// <summary>
     /// Interaction logic for App.xaml
