@@ -24,5 +24,20 @@ namespace MP3_MusicPlayer
         {
             InitializeComponent();
         }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+
+        }
+
+        private void Window_Unloaded(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

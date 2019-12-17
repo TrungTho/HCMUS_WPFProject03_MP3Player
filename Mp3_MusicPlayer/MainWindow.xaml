@@ -4,9 +4,38 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MP3_MusicPlayer"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        mc:Ignorable="d" Loaded="Window_Loaded" Closing="Window_Closing"
+        Title="MainWindow" Height="450" Width="800" Unloaded="Window_Unloaded"
+        >
+    <Window.Resources>
+        <local:NameConverter x:Key="converter"/>
+    </Window.Resources>
+    <Canvas x:Name="mainCanvas" >
+        <Border Height="20" BorderBrush="#FFACACAC" BorderThickness="0,0,0,1">
+            <DockPanel Background="#FFDDDDDD">
+                <Menu DockPanel.Dock="Top">
+                    <MenuItem Header="_File" >
+                        <MenuItem Header="_Exit" Click="FileExit_Click" />
+                    </MenuItem>
+                    <MenuItem Header="_Help">
+                        <MenuItem Header="_About..." Click="HelpAbout_Click" />
+                    </MenuItem>
+                </Menu>
+
+            </DockPanel>
+        </Border>
+
+        <Button Name="addButton" Width="80" Height="35" Content="Browse..." Click="addButton_Click" Canvas.Left="26" Canvas.Top="109"/>
+        <ListBox Name="playlistListBox" Width="300" Height="250" Canvas.Left="451" Canvas.Top="73">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name, Converter={StaticResource converter}}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <Button Name="playButton" Width="80" Height="40" Content="Play" Click="playButton_Click" Canvas.Left="390" Canvas.Top="393" FontSize="16"/>
+        <Button Name="pauseButton" Width="80" Height="35" Content="Pause" Click="pauseButton_Click" Canvas.Left="159" Canvas.Top="74"/>
+        <Slider Canvas.Left="126" Canvas.Top="363" Width="576" Height="24" AutoToolTipPlacement="BottomRight" Cursor="Hand" BorderThickness="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" UseLayoutRounding="True"/>
+        <Label Canvas.Left="136" Content="Label" Canvas.Top="398"/>
+    </Canvas>
 </Window>
