@@ -29,9 +29,13 @@ namespace MP3_MusicPlayer
 
         MediaPlayer _player = new MediaPlayer();
         DispatcherTimer _timer;
+        BindingList<FileInfo> _fullPaths = new BindingList<FileInfo>();
         int _lastIndex = -1;
         private IKeyboardMouseEvents _hook;
 
+        bool _isPlaying = false;
+        bool _isRandomOrder = false;
+        
 
         public MainWindow()
         {
@@ -121,10 +125,7 @@ namespace MP3_MusicPlayer
             else
                 labelDuration.Content = "No file selected...";
         }
-
-        bool _isPlaying = false;
-
-        BindingList<FileInfo> _fullPaths = new BindingList<FileInfo>();
+        
         private void addButton_Click(object sender, RoutedEventArgs e)
         {
             var screen = new Microsoft.Win32.OpenFileDialog();
@@ -200,6 +201,11 @@ namespace MP3_MusicPlayer
         private void ButtonRemoveAll_Click(object sender, RoutedEventArgs e)
         {
             _fullPaths.Clear();
+        }
+
+        private void ButtonShuffle_Checked(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

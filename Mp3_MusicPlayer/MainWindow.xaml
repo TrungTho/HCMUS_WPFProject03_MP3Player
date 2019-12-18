@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MP3_MusicPlayer"
         mc:Ignorable="d" Loaded="Window_Loaded" Closing="Window_Closing"
-        Title="MP3 Music Player" Height="560" Width="800" Unloaded="Window_Unloaded"
+        Title="MP3 Music Player" Height="580" Width="800" Unloaded="Window_Unloaded"
         >
     <Window.Resources>
         <local:NameConverter x:Key="converter"/>
@@ -63,7 +63,7 @@
 
     </Window.Resources>
 
-    <Canvas x:Name="mainCanvas" >
+    <Canvas Name="mainCanvas" >
         <Border Height="20" Width="794" BorderBrush="#FFACACAC" BorderThickness="0,0,0,1">
             <DockPanel Background="#FFDDDDDD" Margin="0,0,0,0.2">
                 <Menu DockPanel.Dock="Top">
@@ -123,17 +123,32 @@
                 Cursor="Hand" BorderThickness="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" UseLayoutRounding="True"/>
         <Label Name="labelDuration" Canvas.Left="86" Content="00:01 / 03:26" Canvas.Top="470" 
                BorderBrush="#FF908B8B" BorderThickness="1"/>
-        <Button x:Name="buttonPrevious" Content="|&lt;&lt;"
-                FontSize="10" Canvas.Left="355" Canvas.Top="468" Height="30" Width="30"/>
-        <Button x:Name="buttonNext" Content="&gt;&gt;|"
-                FontSize="10" Height="30" Canvas.Left="444" Canvas.Top="468" Width="30"/>
-        <Button Name="buttonPlay" Width="50" Height="40" Content="Play" Click="buttonPlay_Click"
-                Canvas.Left="390" Canvas.Top="463" FontSize="16"/>
-        <Slider Name="sliderVolume" Canvas.Left="628" Canvas.Top="477" Width="118" AutoToolTipPlacement="BottomRight"
-                Cursor="Hand" BorderThickness="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" UseLayoutRounding="True" Background="{x:Null}" Height="24"/>
-        <Button Content="Stop" Canvas.Left="307" Canvas.Top="468" Width="30" Height="30"
-                FontSize="12"
-                />
-        
+        <Button Name="buttonPrevious"
+                FontSize="10" Canvas.Left="326" Canvas.Top="480" Height="40" Width="auto">
+            <Image Source="Images/previous_1.png" RenderOptions.BitmapScalingMode="HighQuality"/>
+        </Button>
+        <Button Name="buttonNext"
+                FontSize="10" Height="40" Canvas.Left="438" Canvas.Top="480" Width="auto">
+            <Image Source="Images/next_1.png" RenderOptions.BitmapScalingMode="HighQuality"/>
+        </Button>
+        <Button Name="buttonPlay" Width="60" Height="auto" Click="buttonPlay_Click"
+                Canvas.Left="373" Canvas.Top="470" FontSize="16">
+            <Image Source="Images/play_1.png" RenderOptions.BitmapScalingMode="HighQuality"/>
+        </Button>
+        <Slider Name="sliderVolume" Canvas.Left="619" Canvas.Top="460" Width="118" AutoToolTipPlacement="BottomRight"
+                Cursor="Hand" BorderThickness="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" UseLayoutRounding="True" Height="24"/>
+        <Button Name="buttonStop" Canvas.Left="255" Canvas.Top="480" Width="40" Height="auto"
+                FontSize="12">
+            <Image Source="Images/stop_1.png" RenderOptions.BitmapScalingMode="HighQuality"/>
+        </Button>
+        <ToggleButton Name="buttonLoopMode" Height="30" Width="auto" Canvas.Left="499" Canvas.Top="485"
+                      ToolTip="Click to toggle between 'Loop all', 'Loop one' and 'No Loop'" IsThreeState="True"
+                      >
+            <Image Source="Images/repeat_all.png" RenderOptions.BitmapScalingMode="HighQuality"/>
+        </ToggleButton>
+        <ToggleButton Name="buttonShuffle" Height="30" Width="auto" Canvas.Left="541" Canvas.Top="485"
+                      Checked="ButtonShuffle_Checked">
+            <Image Source="Images/shuffle.png" RenderOptions.BitmapScalingMode="HighQuality"/>
+        </ToggleButton>
     </Canvas>
 </Window>
