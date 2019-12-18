@@ -25,6 +25,8 @@ namespace MP3_MusicPlayer
     /// </summary>
     public partial class MainWindow : Window
     {
+        const string appName = "MP3 Music Player";
+
         MediaPlayer _player = new MediaPlayer();
         DispatcherTimer _timer;
         int _lastIndex = -1;
@@ -45,18 +47,37 @@ namespace MP3_MusicPlayer
         }
 
 
-        private void playButton_Click(object sender, RoutedEventArgs e)
+        private void buttonPlay_Click(object sender, RoutedEventArgs e)
         {
-            if (playlistListBox.SelectedIndex >= 0 &&
-                playlistListBox.SelectedIndex < playlistListBox.Items.Count)
+            if (listBoxPlaylist.SelectedIndex >= 0)
             {
-                _lastIndex = playlistListBox.SelectedIndex;
+
+                _lastIndex = listBoxPlaylist.SelectedIndex;
                 PlaySelectedIndex(_lastIndex);
             }
             else
             {
                 System.Windows.MessageBox.Show("No file selected!");
+                return;
             }
+
+            if (_isPlaying)
+            {
+                _player.Pause();
+                buttonPlay.Content = "Play";
+                _isPlaying = false;
+            }
+            else
+            {
+                if (_player.Source != null)
+                {
+                    _player.Play();
+                    buttonPlay.Content = "Pause";
+                    _isPlaying = true;
+                }
+            }
+            
+            
         }
 
         private void PlaySelectedIndex(int i)
@@ -69,8 +90,8 @@ namespace MP3_MusicPlayer
             // Tạm ngưng 0.5 s trước khi chuyển sang bài kế tiếp
             System.Threading.Thread.Sleep(500);
             var duration = _player.NaturalDuration.TimeSpan;
-            var testDuration = new TimeSpan(duration.Hours, duration.Minutes, duration.Seconds - 20);
-            _player.Position = testDuration;
+            //var testDuration = new TimeSpan(duration.Hours, duration.Minutes, duration.Seconds - 20);
+            //_player.Position = testDuration;
 
             _player.Play();
             _isPlaying = true;
@@ -94,41 +115,33 @@ namespace MP3_MusicPlayer
                 var currentPos = _player.Position.ToString(@"mm\:ss");
                 var duration = _player.NaturalDuration.TimeSpan.ToString(@"mm\:ss");
 
-                Title = String.Format($"{currentPos} / {duration} - {shortname}");
+                labelDuration.Content = String.Format($"{currentPos} / {duration}");
+                Title = appName + $" - { shortname}";
             }
             else
-                Title = "No file selected...";
+                labelDuration.Content = "No file selected...";
         }
 
         bool _isPlaying = false;
-
-        private void pauseButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (_isPlaying)
-            {
-                _player.Pause();
-            }
-            else
-            {
-                _player.Play();
-            }
-            _isPlaying = !_isPlaying;
-        }
 
         BindingList<FileInfo> _fullPaths = new BindingList<FileInfo>();
         private void addButton_Click(object sender, RoutedEventArgs e)
         {
             var screen = new Microsoft.Win32.OpenFileDialog();
+            screen.Multiselect = true;
             if (screen.ShowDialog() == true)
             {
-                var info = new FileInfo(screen.FileName);
-                _fullPaths.Add(info);
+                foreach (var filename in screen.FileNames)
+                {
+                    var info = new FileInfo(filename);
+                    _fullPaths.Add(info);
+                }
             }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            playlistListBox.ItemsSource = _fullPaths;
+            listBoxPlaylist.ItemsSource = _fullPaths;
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
@@ -164,6 +177,29 @@ namespace MP3_MusicPlayer
             System.Windows.MessageBox.Show(this,
                 "Nguyễn Khánh Hoàng - 1712457\n      Trần Trung Thọ      - 1712798",
                 "About Us");
+        }
+
+        private void listBoxItemPlay_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ButtonRemoveSelected_Click(object sender, RoutedEventArgs e)
+        {
+            var selecteds = new List<object>();
+            foreach (var item in listBoxPlaylist.SelectedItems)
+            {
+                selecteds.Add(item);
+            }
+            foreach (var selected in selecteds)
+            {
+                _fullPaths.Remove(selected as FileInfo);
+            }
+        }
+
+        private void ButtonRemoveAll_Click(object sender, RoutedEventArgs e)
+        {
+            _fullPaths.Clear();
         }
     }
 }
