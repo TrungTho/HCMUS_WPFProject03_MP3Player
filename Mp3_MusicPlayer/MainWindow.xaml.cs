@@ -377,12 +377,14 @@ namespace MP3_MusicPlayer
         {
             _isRandomOrder = true;
             randomModeIcon.Source = _randomOnIcon;
+            buttonShuffle.ToolTip = "Random: on";
         }
 
         private void ButtonShuffle_Unchecked(object sender, RoutedEventArgs e)
         {
             _isRandomOrder = false;
             randomModeIcon.Source = _randomOffIcon;
+            buttonShuffle.ToolTip = "Random: off";
         }
 
         private void SliderSeeker_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

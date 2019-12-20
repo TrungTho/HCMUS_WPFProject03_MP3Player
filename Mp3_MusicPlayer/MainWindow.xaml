@@ -169,7 +169,8 @@
             <Image Name="btnLoopIcon" Source="Images/repeat_off.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </ToggleButton>
         <ToggleButton Name="buttonShuffle" Height="36" Width="auto" Canvas.Left="541" Canvas.Top="482"
-                      Checked="ButtonShuffle_Checked" Unchecked="ButtonShuffle_Unchecked" IsChecked="False">
+                      Checked="ButtonShuffle_Checked" Unchecked="ButtonShuffle_Unchecked" IsChecked="False"
+                      ToolTip="Click to turn Random Mode On">
             <Image Name="randomModeIcon" Source="Images/shuffle_off.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </ToggleButton>
     </Canvas>
