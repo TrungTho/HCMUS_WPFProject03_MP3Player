@@ -26,6 +26,8 @@ namespace MP3_MusicPlayer
     public partial class MainWindow : Window
     {
         const string appName = "MP3 Music Player";
+        string[] loopModesHints = { "Loop: off", "Loop: one", "Loop: all"};
+        string currently = "Currently Playing: ";
 
         MediaPlayer _player = new MediaPlayer();
         DispatcherTimer _timer;
@@ -35,10 +37,13 @@ namespace MP3_MusicPlayer
 
         bool _isPlaying = false;
         bool _isRandomOrder = false;
+        int _loopMode = 0; // 0 - loop off, 1 - loop One, 2 - loop All
 
-        BitmapImage playIcon;
-        BitmapImage pauseIcon;
-        
+        BitmapImage _playIcon;
+        BitmapImage _pauseIcon;
+        BitmapImage[] _loopModes;
+        BitmapImage _randomOnIcon;
+        BitmapImage _randomOffIcon;
 
         public MainWindow()
         {
@@ -56,17 +61,16 @@ namespace MP3_MusicPlayer
 
         private void _player_MediaOpened(object sender, EventArgs e)
         {
-            var position = _player.NaturalDuration.TimeSpan;
             sliderSeeker.Minimum = 0;
-            sliderSeeker.Maximum = position.TotalSeconds;
-
+            sliderSeeker.Maximum = _player.NaturalDuration.TimeSpan.TotalSeconds;
+            //sliderSeeker.SmallChange = 1;
+            //sliderSeeker.LargeChange = 10;
         }
 
-        private void buttonPlay_Click(object sender, RoutedEventArgs e)
+        private void ButtonPlay_Click(object sender, RoutedEventArgs e)
         {
             //if (listBoxPlaylist.SelectedIndex >= 0)
             //{
-
             //    _lastIndex = listBoxPlaylist.SelectedIndex;
             //    PlaySelectedIndex(_lastIndex);
             //}
@@ -79,7 +83,7 @@ namespace MP3_MusicPlayer
             if (_isPlaying)
             {
                 _player.Pause();
-                btnPlayIcon.Source = pauseIcon;
+                btnPlayIcon.Source = _playIcon;
                 _isPlaying = false;
             }
             else
@@ -87,12 +91,17 @@ namespace MP3_MusicPlayer
                 if (_player.Source != null)
                 {
                     _player.Play();
-                    btnPlayIcon.Source = playIcon;
+                    btnPlayIcon.Source = _pauseIcon;
                     _isPlaying = true;
+                    _timer.Start();
                 }
-            }
-            
-            
+                else
+                {
+                    if (_lastIndex < 0)
+                        _lastIndex = 0;
+                    PlaySelectedIndex(_lastIndex);
+                }
+            }           
         }
 
         private void PlaySelectedIndex(int i)
@@ -104,18 +113,28 @@ namespace MP3_MusicPlayer
             }
             else
             {
-                System.Windows.MessageBox.Show("The file you have chosen is not an MP3 file", "Invalid Extension");
+                System.Windows.MessageBox.Show("The file you have chosen is not an MP3 file",
+                    "Invalid Extension");
                 return;
             }
 
-            
+            var name = _fullPaths[i].Name;
+            var converter = new NameConverter();
+            var shortname = converter.Convert(name, null, null, null);
+            Title = appName + $" : { shortname}";
+            labelCurrentPlay.Text = currently + shortname;
+
             _player.Open(new Uri(filename, UriKind.Absolute));
 
             // Tạm ngưng 0.5 s trước khi chuyển sang bài kế tiếp
             System.Threading.Thread.Sleep(500);
             TimeSpan duration;
             if (_player.NaturalDuration.HasTimeSpan)
+            {
                 duration = _player.NaturalDuration.TimeSpan;
+                //sliderSeeker.Minimum = 0;
+                //sliderSeeker.Maximum = duration.TotalSeconds;
+            }
             else
             {
                 System.Windows.MessageBox.Show("Error occured!");
@@ -124,14 +143,43 @@ namespace MP3_MusicPlayer
             //var testDuration = new TimeSpan(duration.Hours, duration.Minutes, duration.Seconds - 20);
             //_player.Position = testDuration;
 
-            _player.Play();
-            _isPlaying = true;
-            _timer.Start();
+            ButtonPlay_Click(buttonPlay, null);
+            //_player.Play();
+            //_isPlaying = true;
+            //_timer.Start();
+
         }
 
         private void _player_MediaEnded(object sender, EventArgs e)
         {
-            _lastIndex++;
+            _isPlaying = false;
+            sliderSeeker.Value = 0;
+            if (_isRandomOrder == false)
+            {
+                switch (_loopMode)
+                {
+                    case 0: // loop off
+                        if (_lastIndex < _fullPaths.Count - 1)
+                            _lastIndex++;
+                        else
+                        {
+                            return;
+                        }
+                        break;
+                    case 1: // loop one
+                        break;
+                    case 2: // loop all
+                        _lastIndex = (_lastIndex + 1) % _fullPaths.Count;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                Random rng = new Random();
+                _lastIndex = rng.Next(_fullPaths.Count);
+            }
             PlaySelectedIndex(_lastIndex);
         }
 
@@ -141,9 +189,9 @@ namespace MP3_MusicPlayer
             {
                 sliderSeeker.Value = _player.Position.TotalSeconds;
 
-                var filename = _fullPaths[_lastIndex].Name;
-                var converter = new NameConverter();
-                var shortname = converter.Convert(filename, null, null, null);
+                //var filename = _fullPaths[_lastIndex].Name;
+                //var converter = new NameConverter();
+                //var shortname = converter.Convert(filename, null, null, null);
 
                 var currentPos = _player.Position.ToString(@"mm\:ss");
                 string duration = "";
@@ -155,7 +203,7 @@ namespace MP3_MusicPlayer
                     return;
                 }
                 labelDuration.Content = String.Format($"{currentPos} / {duration}");
-                Title = appName + $" : { shortname}";
+                //Title = appName + $" : { shortname}";
             }
             else
                 labelDuration.Content = "No file selected...";
@@ -180,8 +228,14 @@ namespace MP3_MusicPlayer
         {
             listBoxPlaylist.ItemsSource = _fullPaths;
             LoadRecentPlayList();
-            playIcon = new BitmapImage(new Uri("Images/play_1.png", UriKind.Relative));
-            pauseIcon = new BitmapImage(new Uri("Images/pause_1.png", UriKind.Relative));
+            _playIcon = new BitmapImage(new Uri("Images/play_1.png", UriKind.Relative));
+            _pauseIcon = new BitmapImage(new Uri("Images/pause_1.png", UriKind.Relative));
+            _loopModes = new BitmapImage[3];
+            _loopModes[0] = new BitmapImage(new Uri("Images/repeat_off.png", UriKind.Relative));
+            _loopModes[1] = new BitmapImage(new Uri("Images/repeat_one.png", UriKind.Relative));
+            _loopModes[2] = new BitmapImage(new Uri("Images/repeat_all.png", UriKind.Relative));
+            _randomOnIcon = new BitmapImage(new Uri("Images/shuffle_on.png", UriKind.Relative));
+            _randomOffIcon = new BitmapImage(new Uri("Images/shuffle_off.png", UriKind.Relative));
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
@@ -243,9 +297,24 @@ namespace MP3_MusicPlayer
 
         private void LoadRecentPlayList()
         {
-            var reader = new StreamReader("recent.txt");
+            StreamReader reader;
+            try
+            {
+                reader = new StreamReader("recent.txt");
+            }
+            catch (FileNotFoundException)
+            {
+                //System.Windows.MessageBox.Show(ex.Message, "File Not Found!");
+                var writer = new StreamWriter("recent.txt");
+                writer.Close();
+                return;
+            }
+            
+
             // first line is the index last played music file
-            int _lastIndex = int.Parse(reader.ReadLine());
+            _lastIndex = int.Parse(reader.ReadLine());
+            
+
             // second line is the number of files in the playlist
             int count = int.Parse(reader.ReadLine());
             for (int i = 0; i < count; i++)
@@ -255,6 +324,13 @@ namespace MP3_MusicPlayer
                 _fullPaths.Add(info);
             }
 
+            if (_lastIndex >= 0)
+            {
+                var filename = _fullPaths[_lastIndex].Name;
+                var converter = new NameConverter();
+                var shortname = converter.Convert(filename, null, null, null);
+                labelCurrentPlay.Text = currently + shortname;
+            }
         }
 
 
@@ -275,6 +351,7 @@ namespace MP3_MusicPlayer
             var clickedItem = sender as System.Windows.Controls.MenuItem;
             var selected = clickedItem.DataContext as FileInfo;
             _lastIndex = _fullPaths.IndexOf(selected);
+            ButtonStop_Click(null, null);
             PlaySelectedIndex(_lastIndex);           
         }
 
@@ -298,7 +375,14 @@ namespace MP3_MusicPlayer
 
         private void ButtonShuffle_Checked(object sender, RoutedEventArgs e)
         {
+            _isRandomOrder = true;
+            randomModeIcon.Source = _randomOnIcon;
+        }
 
+        private void ButtonShuffle_Unchecked(object sender, RoutedEventArgs e)
+        {
+            _isRandomOrder = false;
+            randomModeIcon.Source = _randomOffIcon;
         }
 
         private void SliderSeeker_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -349,6 +433,79 @@ namespace MP3_MusicPlayer
                 } while (true);
                     
             }
+        }
+
+        private void ButtonStop_Click(object sender, RoutedEventArgs e)
+        {
+            _player.Stop();
+            sliderSeeker.Value = _player.Position.TotalSeconds;
+            _isPlaying = false;
+            _timer.Stop();
+            btnPlayIcon.Source = _playIcon;
+            string tmp = labelDuration.Content.ToString();
+            tmp = tmp.Remove(0, tmp.IndexOf('/'));
+            tmp = tmp.Insert(0, "00:00 ");
+            labelDuration.Content = tmp;
+        }
+
+        private void ButtonPrevious_Click(object sender, RoutedEventArgs e)
+        {
+            if (_lastIndex > 0)
+            {
+                _lastIndex--;
+                ButtonStop_Click(null, null);
+                PlaySelectedIndex(_lastIndex);
+            }
+            else
+            {
+                if (_loopMode == 2) // Loop All
+                {
+                    _lastIndex = _fullPaths.Count - 1;
+                    ButtonStop_Click(null, null);
+                    PlaySelectedIndex(_lastIndex);
+                }
+            }
+        }
+
+        private void ButtonNext_Click(object sender, RoutedEventArgs e)
+        {
+            if (_lastIndex < _fullPaths.Count - 1)
+            {
+                _lastIndex++;
+                ButtonStop_Click(null, null);
+                PlaySelectedIndex(_lastIndex);
+            }
+            else
+            {
+                if (_loopMode == 2) // Loop All
+                {
+                    _lastIndex = 0;
+                    ButtonStop_Click(null, null);
+                    PlaySelectedIndex(_lastIndex);
+                }
+            }
+        }
+
+        private void ButtonLoopMode_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ButtonLoopMode_Unchecked(object sender, RoutedEventArgs e)
+        {
+
+        }
+        
+        private void ButtonLoopMode_Indeterminate(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ButtonLoopMode_Click(object sender, RoutedEventArgs e)
+        {
+            _loopMode = (_loopMode + 1 ) % 3;
+            btnLoopIcon.Source = _loopModes[_loopMode];
+            buttonLoopMode.ToolTip = loopModesHints[_loopMode];
         }
     }
 }
