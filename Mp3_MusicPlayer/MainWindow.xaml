@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MP3_MusicPlayer"
         mc:Ignorable="d" Loaded="Window_Loaded" Closing="Window_Closing" Icon="Images/appIcon.png"
-        Title="MP3 Music Player" Height="580" Width="800" Unloaded="Window_Unloaded" ResizeMode="CanMinimize"
+        Title="MP3 Music Player" Height="580" Width="800" Unloaded="Window_Unloaded" ResizeMode="CanMinimize" KeyDown="Window_KeyDown"
         >
     <Window.Resources>
         <local:NameConverter x:Key="converter"/>
@@ -63,14 +63,24 @@
 
     </Window.Resources>
 
+    <Window.CommandBindings>
+        <CommandBinding Command="Open" CanExecute="OpenCommand_CanExecute" Executed="OpenCommand_Executed" />
+        <CommandBinding Command="Save" CanExecute="SaveCommand_CanExecute" Executed="SaveCommand_Executed" />
+        <CommandBinding Command="New" CanExecute="NewCommand_CanExecute" Executed="NewCommand_Executed" />
+    </Window.CommandBindings>
+    
     <Canvas Name="mainCanvas" >
         <Border Height="20" Width="794" BorderBrush="#FFACACAC" BorderThickness="0,0,0,1">
             <DockPanel Background="#FFDDDDDD" Margin="0,0,0,0.2">
                 <Menu DockPanel.Dock="Top">
                     <MenuItem Header="_File" >
+                        <MenuItem Command="Open"/>
+                        <MenuItem Command="Save"/>
+                        <MenuItem Header="Add file(s)" Command="New"/>
                         <MenuItem Header="_Exit" Click="FileExit_Click" />
                     </MenuItem>
                     <MenuItem Header="_Help">
+                        <MenuItem Header="_Keyboard Shortcuts" Click="HelpShortcuts_Click" />
                         <MenuItem Header="_About..." Click="HelpAbout_Click" />
                     </MenuItem>
                 </Menu>

@@ -28,6 +28,15 @@ namespace MP3_MusicPlayer
         const string appName = "MP3 Music Player";
         string[] loopModesHints = { "Loop: off", "Loop: one", "Loop: all"};
         string currently = "Currently Playing: ";
+        string[] kbShortcuts =
+        {
+            "Ctrl + N : Add file(s) to current playlist",
+            "Ctrl + O : Open a saved playlist",
+            "Ctrl + S : Save current playlist",
+            "Ctrl + Shift + J : Previous Song",
+            "Ctrl + Shift + K : Play/Pause",
+            "Ctrl + Shift + L : Next Song"
+        };
 
         MediaPlayer _player = new MediaPlayer();
         DispatcherTimer _timer;
@@ -245,21 +254,36 @@ namespace MP3_MusicPlayer
 
         private void KeyUp_hook(object sender, System.Windows.Forms.KeyEventArgs e)
         {
-            if (e.Control && e.Shift && (e.KeyCode == Keys.E))
+            if (e.Control && e.Shift && (e.KeyCode == Keys.J))
             {
-                //System.Windows.MessageBox.Show("Ctrl + Shift + E pressed"); ;
-                _lastIndex++;
-                PlaySelectedIndex(_lastIndex);
+                ButtonPrevious_Click(null, null);
             }
-            if (e.Control && (e.KeyCode == Keys.O))
+
+            if (e.Control && e.Shift && (e.KeyCode == Keys.L))
+            {
+                //System.Windows.MessageBox.Show("Ctrl + Shift + L pressed"); ;
+                ButtonNext_Click(null, null);   
+            }
+
+            if (e.Control && e.Shift && (e.KeyCode == Keys.K))
+            {
+                ButtonPlay_Click(null, null);
+            }
+        }
+
+        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (Keyboard.Modifiers == ModifierKeys.Control && (e.Key == Key.O))
             {
                 ButtonLoad_Click(buttonLoad, null);
             }
-            if (e.Control && (e.KeyCode == Keys.S))
+
+            if (Keyboard.Modifiers == ModifierKeys.Control && (e.Key == Key.S))
             {
                 ButtonSave_Click(buttonSave, null);
             }
-            if (e.Control && (e.KeyCode == Keys.A))
+
+            if (Keyboard.Modifiers == ModifierKeys.Control && (e.Key == Key.N))
             {
                 ButtonAdd_Click(buttonAdd, null);
             }
@@ -418,6 +442,7 @@ namespace MP3_MusicPlayer
 
         private void ButtonLoad_Click(object sender, RoutedEventArgs e)
         {
+            _fullPaths.Clear();
             var screen = new Microsoft.Win32.OpenFileDialog();
             if (screen.ShowDialog() == true)
             {
@@ -508,6 +533,46 @@ namespace MP3_MusicPlayer
             _loopMode = (_loopMode + 1 ) % 3;
             btnLoopIcon.Source = _loopModes[_loopMode];
             buttonLoopMode.ToolTip = loopModesHints[_loopMode];
+        }
+
+        private void HelpShortcuts_Click(object sender, RoutedEventArgs e)
+        {
+            string toShow = "";
+            foreach (var sc in kbShortcuts)
+            {
+                toShow = toShow + sc + "\n";
+            }
+            System.Windows.MessageBox.Show(toShow, "Keyboard Shortcuts");
+        }
+
+        private void NewCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void NewCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ButtonAdd_Click(buttonAdd, null);
+        }
+
+        private void OpenCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void OpenCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ButtonLoad_Click(buttonLoad, null);
+        }
+
+        private void SaveCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void SaveCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ButtonSave_Click(buttonSave, null);
         }
     }
 }
