@@ -321,7 +321,7 @@ namespace MP3_MusicPlayer
 
         private void LoadRecentPlayList()
         {
-            StreamReader reader;
+			StreamReader reader;
             try
             {
                 reader = new StreamReader("recent.txt");
