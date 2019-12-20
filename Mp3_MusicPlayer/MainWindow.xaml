@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MP3_MusicPlayer"
-        mc:Ignorable="d" Loaded="Window_Loaded" Closing="Window_Closing"
+        mc:Ignorable="d" Loaded="Window_Loaded" Closing="Window_Closing" Icon="Images/appIcon.png"
         Title="MP3 Music Player" Height="580" Width="800" Unloaded="Window_Unloaded" ResizeMode="CanMinimize"
         >
     <Window.Resources>
@@ -79,8 +79,8 @@
         </Border>
 
         <Button Name="buttonAdd" Width="80" Height="35" Content="Browse..." Click="ButtonAdd_Click" Canvas.Left="24" Canvas.Top="40"/>
-        <TextBlock TextWrapping="Wrap" Text="Currently Playing" Width="auto" Canvas.Left="472" Canvas.Top="24"/>
-        <Border Canvas.Left="354" Canvas.Top="44">
+        <TextBlock Name="labelCurrentPlay" TextWrapping="Wrap" Text="Currently Playing" Width="auto" Canvas.Left="352" Canvas.Top="24"/>
+        <Border Canvas.Left="350" Canvas.Top="44">
             <StackPanel Orientation="Vertical">
                 <ListBox Name="listBoxPlaylist" Width="auto" Height="330" SelectionMode="Multiple">
                     <ListBox.ItemTemplate>
@@ -143,32 +143,34 @@
                 Cursor="Hand" BorderThickness="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" UseLayoutRounding="True" ValueChanged="SliderSeeker_ValueChanged"/>
         <Label Name="labelDuration" Canvas.Left="86" Content="00:01 / 03:26" Canvas.Top="470" 
                BorderBrush="#FF908B8B" BorderThickness="1"/>
-        <Button Name="buttonPrevious"
+        <Button Name="buttonPrevious" Click="ButtonPrevious_Click"
                 FontSize="10" Canvas.Left="326" Canvas.Top="480" Height="40" Width="auto">
             <Image Source="Images/previous_1.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </Button>
-        <Button Name="buttonNext"
+        <Button Name="buttonNext" Click="ButtonNext_Click"
                 FontSize="10" Height="40" Canvas.Left="438" Canvas.Top="480" Width="auto">
             <Image Source="Images/next_1.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </Button>
-        <Button Name="buttonPlay" Width="60" Height="auto" Click="buttonPlay_Click"
+        <Button Name="buttonPlay" Width="60" Height="auto" Click="ButtonPlay_Click"
                 Canvas.Left="373" Canvas.Top="470" FontSize="16">
             <Image Name="btnPlayIcon" Source="Images/play_1.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </Button>
         <Slider Name="sliderVolume" Canvas.Left="619" Canvas.Top="460" Width="118" AutoToolTipPlacement="BottomRight"
                 Cursor="Hand" BorderThickness="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" UseLayoutRounding="True" Height="24"/>
         <Button Name="buttonStop" Canvas.Left="255" Canvas.Top="480" Width="40" Height="auto"
-                FontSize="12">
+                FontSize="12" Click="ButtonStop_Click">
             <Image Source="Images/stop_1.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </Button>
-        <ToggleButton Name="buttonLoopMode" Height="30" Width="auto" Canvas.Left="499" Canvas.Top="485"
+        <ToggleButton Name="buttonLoopMode" Height="36" Width="auto" Canvas.Left="499" Canvas.Top="482"
                       ToolTip="Click to toggle between 'Loop all', 'Loop one' and 'No Loop'" IsThreeState="True"
+                      IsChecked="{x:Null}" Checked="ButtonLoopMode_Checked" Unchecked="ButtonLoopMode_Unchecked"
+                      Indeterminate="ButtonLoopMode_Indeterminate" Click="ButtonLoopMode_Click"
                       >
-            <Image Source="Images/repeat_all.png" RenderOptions.BitmapScalingMode="HighQuality"/>
+            <Image Name="btnLoopIcon" Source="Images/repeat_off.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </ToggleButton>
-        <ToggleButton Name="buttonShuffle" Height="30" Width="auto" Canvas.Left="541" Canvas.Top="485"
-                      Checked="ButtonShuffle_Checked">
-            <Image Source="Images/shuffle.png" RenderOptions.BitmapScalingMode="HighQuality"/>
+        <ToggleButton Name="buttonShuffle" Height="36" Width="auto" Canvas.Left="541" Canvas.Top="482"
+                      Checked="ButtonShuffle_Checked" Unchecked="ButtonShuffle_Unchecked" IsChecked="False">
+            <Image Name="randomModeIcon" Source="Images/shuffle_off.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </ToggleButton>
     </Canvas>
 </Window>
