@@ -40,6 +40,7 @@ namespace MP3_MusicPlayer
         public MainWindow()
         {
             InitializeComponent();
+            _player.MediaOpened += _player_MediaOpened;
             _player.MediaEnded += _player_MediaEnded;
             _timer = new DispatcherTimer();
             _timer.Interval = TimeSpan.FromSeconds(1);
@@ -50,6 +51,13 @@ namespace MP3_MusicPlayer
             _hook.KeyUp += KeyUp_hook;
         }
 
+        private void _player_MediaOpened(object sender, EventArgs e)
+        {
+            var position = _player.NaturalDuration.TimeSpan;
+            sliderSeeker.Minimum = 0;
+            sliderSeeker.Maximum = position.TotalSeconds;
+
+        }
 
         private void buttonPlay_Click(object sender, RoutedEventArgs e)
         {
@@ -93,7 +101,14 @@ namespace MP3_MusicPlayer
 
             // Tạm ngưng 0.5 s trước khi chuyển sang bài kế tiếp
             System.Threading.Thread.Sleep(500);
-            var duration = _player.NaturalDuration.TimeSpan;
+            TimeSpan duration;
+            if (_player.NaturalDuration.HasTimeSpan)
+                duration = _player.NaturalDuration.TimeSpan;
+            else
+            {
+                System.Windows.MessageBox.Show("Error occured!");
+                return;
+            }
             //var testDuration = new TimeSpan(duration.Hours, duration.Minutes, duration.Seconds - 20);
             //_player.Position = testDuration;
 
@@ -112,13 +127,21 @@ namespace MP3_MusicPlayer
         {
             if (_player.Source != null)
             {
+                sliderSeeker.Value = _player.Position.TotalSeconds;
+
                 var filename = _fullPaths[_lastIndex].Name;
                 var converter = new NameConverter();
                 var shortname = converter.Convert(filename, null, null, null);
 
                 var currentPos = _player.Position.ToString(@"mm\:ss");
-                var duration = _player.NaturalDuration.TimeSpan.ToString(@"mm\:ss");
-
+                string duration = "";
+                if (_player.NaturalDuration.HasTimeSpan)
+                    duration = _player.NaturalDuration.TimeSpan.ToString(@"mm\:ss");
+                else
+                {
+                    System.Windows.MessageBox.Show("Error occured!");
+                    return;
+                }
                 labelDuration.Content = String.Format($"{currentPos} / {duration}");
                 Title = appName + $" - { shortname}";
             }
@@ -182,7 +205,10 @@ namespace MP3_MusicPlayer
 
         private void listBoxItemPlay_Click(object sender, RoutedEventArgs e)
         {
-
+            var clickedItem = sender as System.Windows.Controls.MenuItem;
+            var selected = clickedItem.DataContext as FileInfo;
+            _lastIndex = _fullPaths.IndexOf(selected);
+            PlaySelectedIndex(_lastIndex);           
         }
 
         private void ButtonRemoveSelected_Click(object sender, RoutedEventArgs e)
@@ -206,6 +232,13 @@ namespace MP3_MusicPlayer
         private void ButtonShuffle_Checked(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void SliderSeeker_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            //int pos = Convert.ToInt32(sliderSeeker.Value);
+            double pos = sliderSeeker.Value;
+            _player.Position = TimeSpan.FromSeconds(pos);
         }
     }
 }
