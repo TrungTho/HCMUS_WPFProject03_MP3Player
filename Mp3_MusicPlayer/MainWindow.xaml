@@ -78,7 +78,7 @@
             </DockPanel>
         </Border>
 
-        <Button Name="addButton" Width="80" Height="35" Content="Browse..." Click="addButton_Click" Canvas.Left="24" Canvas.Top="40"/>
+        <Button Name="buttonAdd" Width="80" Height="35" Content="Browse..." Click="ButtonAdd_Click" Canvas.Left="24" Canvas.Top="40"/>
         <TextBlock TextWrapping="Wrap" Text="Currently Playing" Width="auto" Canvas.Left="472" Canvas.Top="24"/>
         <Border Canvas.Left="354" Canvas.Top="44">
             <StackPanel Orientation="Vertical">
@@ -116,7 +116,7 @@
                         </StackPanel>
                     </Button>
 
-                    <Button Name="buttonSave" Width="auto" Height="30" Margin="5,0,0,0">
+                    <Button Name="buttonSave" Width="auto" Height="30" Margin="5,0,0,0" Click="ButtonSave_Click">
                         <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
                             <Image Source="Images/save.png"
                                    RenderOptions.BitmapScalingMode="HighQuality"
@@ -126,7 +126,7 @@
                         </StackPanel>
                     </Button>
 
-                    <Button Name="buttonLoad" Width="auto" Height="30" Margin="5,0,0,0">
+                    <Button Name="buttonLoad" Width="auto" Height="30" Margin="5,0,0,0" Click="ButtonLoad_Click">
                         <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
                             <Image Source="Images/folder.png"
                                    RenderOptions.BitmapScalingMode="HighQuality"
@@ -153,7 +153,7 @@
         </Button>
         <Button Name="buttonPlay" Width="60" Height="auto" Click="buttonPlay_Click"
                 Canvas.Left="373" Canvas.Top="470" FontSize="16">
-            <Image Source="Images/play_1.png" RenderOptions.BitmapScalingMode="HighQuality"/>
+            <Image Name="btnPlayIcon" Source="Images/play_1.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </Button>
         <Slider Name="sliderVolume" Canvas.Left="619" Canvas.Top="460" Width="118" AutoToolTipPlacement="BottomRight"
                 Cursor="Hand" BorderThickness="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" UseLayoutRounding="True" Height="24"/>

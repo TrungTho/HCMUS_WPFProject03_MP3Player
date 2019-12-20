@@ -35,6 +35,9 @@ namespace MP3_MusicPlayer
 
         bool _isPlaying = false;
         bool _isRandomOrder = false;
+
+        BitmapImage playIcon;
+        BitmapImage pauseIcon;
         
 
         public MainWindow()
@@ -61,22 +64,22 @@ namespace MP3_MusicPlayer
 
         private void buttonPlay_Click(object sender, RoutedEventArgs e)
         {
-            if (listBoxPlaylist.SelectedIndex >= 0)
-            {
+            //if (listBoxPlaylist.SelectedIndex >= 0)
+            //{
 
-                _lastIndex = listBoxPlaylist.SelectedIndex;
-                PlaySelectedIndex(_lastIndex);
-            }
-            else
-            {
-                System.Windows.MessageBox.Show("No file selected!");
-                return;
-            }
+            //    _lastIndex = listBoxPlaylist.SelectedIndex;
+            //    PlaySelectedIndex(_lastIndex);
+            //}
+            //else
+            //{
+            //    System.Windows.MessageBox.Show("No file selected!");
+            //    return;
+            //}
 
             if (_isPlaying)
             {
                 _player.Pause();
-                buttonPlay.Content = "Play";
+                btnPlayIcon.Source = pauseIcon;
                 _isPlaying = false;
             }
             else
@@ -84,7 +87,7 @@ namespace MP3_MusicPlayer
                 if (_player.Source != null)
                 {
                     _player.Play();
-                    buttonPlay.Content = "Pause";
+                    btnPlayIcon.Source = playIcon;
                     _isPlaying = true;
                 }
             }
@@ -94,9 +97,18 @@ namespace MP3_MusicPlayer
 
         private void PlaySelectedIndex(int i)
         {
+            string filename;
+            if (_fullPaths[i].Extension == ".mp3")
+            {
+                filename = _fullPaths[i].FullName;
+            }
+            else
+            {
+                System.Windows.MessageBox.Show("The file you have chosen is not an MP3 file", "Invalid Extension");
+                return;
+            }
 
-            string filename = _fullPaths[i].FullName;
-
+            
             _player.Open(new Uri(filename, UriKind.Absolute));
 
             // Tạm ngưng 0.5 s trước khi chuyển sang bài kế tiếp
@@ -143,15 +155,16 @@ namespace MP3_MusicPlayer
                     return;
                 }
                 labelDuration.Content = String.Format($"{currentPos} / {duration}");
-                Title = appName + $" - { shortname}";
+                Title = appName + $" : { shortname}";
             }
             else
                 labelDuration.Content = "No file selected...";
         }
         
-        private void addButton_Click(object sender, RoutedEventArgs e)
+        private void ButtonAdd_Click(object sender, RoutedEventArgs e)
         {
             var screen = new Microsoft.Win32.OpenFileDialog();
+            screen.Title = "Add new music files to current playlist";
             screen.Multiselect = true;
             if (screen.ShowDialog() == true)
             {
@@ -166,6 +179,8 @@ namespace MP3_MusicPlayer
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             listBoxPlaylist.ItemsSource = _fullPaths;
+            playIcon = new BitmapImage(new Uri("Images/play_1.png", UriKind.Relative));
+            pauseIcon = new BitmapImage(new Uri("Images/pause_1.png", UriKind.Relative));
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
@@ -181,14 +196,35 @@ namespace MP3_MusicPlayer
                 _lastIndex++;
                 PlaySelectedIndex(_lastIndex);
             }
+            if (e.Control && (e.KeyCode == Keys.O))
+            {
+                ButtonLoad_Click(buttonLoad, null);
+            }
+            if (e.Control && (e.KeyCode == Keys.S))
+            {
+                ButtonSave_Click(buttonSave, null);
+            }
+            if (e.Control && (e.KeyCode == Keys.A))
+            {
+                ButtonAdd_Click(buttonAdd, null);
+            }
         }
 
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            _hook.KeyUp -= KeyUp_hook;
-            _hook.Dispose();
-
+            if (System.Windows.MessageBox.Show("Are you sure you want to exit?", "Exiting...", System.Windows.MessageBoxButton.YesNo)
+                != System.Windows.MessageBoxResult.Yes)
+            {
+                e.Cancel = true;
+                return;
+            }
+            else
+            {
+                //SaveCurrentPlayList();
+                _hook.KeyUp -= KeyUp_hook;
+                _hook.Dispose();
+            }
         }
 
         private void FileExit_Click(object sender, RoutedEventArgs e)
@@ -239,6 +275,49 @@ namespace MP3_MusicPlayer
             //int pos = Convert.ToInt32(sliderSeeker.Value);
             double pos = sliderSeeker.Value;
             _player.Position = TimeSpan.FromSeconds(pos);
+        }
+
+        private void ButtonSave_Click(object sender, RoutedEventArgs e)
+        {
+            var screen = new Microsoft.Win32.SaveFileDialog();
+            //screen.AddExtension = true;
+            if (screen.ShowDialog() == true)
+            {
+                string playlist = screen.FileName;
+                var writer = new StreamWriter(playlist);
+                foreach (var path in _fullPaths)
+                {
+                    writer.WriteLine(path);
+                }
+
+                writer.Close();
+                //if (fileinfo.Exists)
+                //{
+                //    System.Windows.MessageBox.Show("Please specify a different filename", "Duplicate Filename Found");
+                //}
+                //else { }
+            }
+        }
+
+        private void ButtonLoad_Click(object sender, RoutedEventArgs e)
+        {
+            var screen = new Microsoft.Win32.OpenFileDialog();
+            if (screen.ShowDialog() == true)
+            {
+                string playlist = screen.FileName;
+                var reader = new StreamReader(playlist);
+                do
+                {
+                    string line = reader.ReadLine();
+                    if (line == null) break;
+                    FileInfo info = new FileInfo(line);
+                    if (info.Exists)
+                    {
+                        _fullPaths.Add(info);
+                    }
+                } while (true);
+                    
+            }
         }
     }
 }
