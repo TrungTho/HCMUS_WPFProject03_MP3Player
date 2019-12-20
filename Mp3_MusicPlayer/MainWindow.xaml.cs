@@ -243,18 +243,24 @@ namespace MP3_MusicPlayer
 
         private void LoadRecentPlayList()
         {
-            var reader = new StreamReader("recent.txt");
-            // first line is the index last played music file
-            int _lastIndex = int.Parse(reader.ReadLine());
-            // second line is the number of files in the playlist
-            int count = int.Parse(reader.ReadLine());
-            for (int i = 0; i < count; i++)
+            try
             {
-                string filename = reader.ReadLine();
-                FileInfo info = new FileInfo(filename);
-                _fullPaths.Add(info);
+                var reader = new StreamReader("recent.txt");
+                // first line is the index last played music file
+                int _lastIndex = int.Parse(reader.ReadLine());
+                // second line is the number of files in the playlist
+                int count = int.Parse(reader.ReadLine());
+                for (int i = 0; i < count; i++)
+                {
+                    string filename = reader.ReadLine();
+                    FileInfo info = new FileInfo(filename);
+                    _fullPaths.Add(info);
+                }
             }
-
+            catch(Exception e)
+            {
+                System.Windows.MessageBox.Show("Can't find last played playlist!");
+            }
         }
 
 
