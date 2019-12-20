@@ -179,6 +179,7 @@ namespace MP3_MusicPlayer
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             listBoxPlaylist.ItemsSource = _fullPaths;
+            LoadRecentPlayList();
             playIcon = new BitmapImage(new Uri("Images/play_1.png", UriKind.Relative));
             pauseIcon = new BitmapImage(new Uri("Images/pause_1.png", UriKind.Relative));
         }
@@ -221,11 +222,41 @@ namespace MP3_MusicPlayer
             }
             else
             {
-                //SaveCurrentPlayList();
+                SaveRecentPlayList();
                 _hook.KeyUp -= KeyUp_hook;
                 _hook.Dispose();
             }
         }
+
+        private void SaveRecentPlayList()
+        {
+            string filename = "recent.txt";
+            var writer = new StreamWriter(filename);
+            writer.WriteLine(_lastIndex);
+            writer.WriteLine(_fullPaths.Count);
+            foreach (var path in _fullPaths)
+            {
+                writer.WriteLine(path);
+            }
+            writer.Close();
+        }
+
+        private void LoadRecentPlayList()
+        {
+            var reader = new StreamReader("recent.txt");
+            // first line is the index last played music file
+            int _lastIndex = int.Parse(reader.ReadLine());
+            // second line is the number of files in the playlist
+            int count = int.Parse(reader.ReadLine());
+            for (int i = 0; i < count; i++)
+            {
+                string filename = reader.ReadLine();
+                FileInfo info = new FileInfo(filename);
+                _fullPaths.Add(info);
+            }
+
+        }
+
 
         private void FileExit_Click(object sender, RoutedEventArgs e)
         {
