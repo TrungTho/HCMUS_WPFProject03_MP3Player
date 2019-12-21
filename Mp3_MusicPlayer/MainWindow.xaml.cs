@@ -162,7 +162,8 @@ namespace MP3_MusicPlayer
         private void _player_MediaEnded(object sender, EventArgs e)
         {
             _isPlaying = false;
-            sliderSeeker.Value = 0;
+            //sliderSeeker.Value = 0;
+            ButtonStop_Click(null, null);
             if (_isRandomOrder == false)
             {
                 switch (_loopMode)
@@ -172,6 +173,7 @@ namespace MP3_MusicPlayer
                             _lastIndex++;
                         else
                         {
+                            
                             return;
                         }
                         break;
