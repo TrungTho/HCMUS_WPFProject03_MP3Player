@@ -115,6 +115,9 @@ namespace MP3_MusicPlayer
 
         private void PlaySelectedIndex(int i)
         {
+            //highlight playing song
+            listViewPlaylist.SelectedIndex = i;
+
             string filename;
             if (_fullPaths[i].Properties.MediaTypes.ToString() == "Audio")
             {

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,20 +8,12 @@ using System.Windows.Data;
 
 namespace MP3_MusicPlayer
 {
-    public class NameConverter : IValueConverter
+    class DurationConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string filePath = value as string;
-            string res = filePath.Substring(filePath.LastIndexOf("\\")+1);
-
-            var info = TagLib.File.Create(filePath);
-            if (info.Tag.Title != null)
-                res = info.Tag.Title;
-            else //remove extension name
-                res = res.Substring(0, res.LastIndexOf("."));
-
-            return res;                
+            string duration = value.ToString();
+            return duration.Substring(0, 8);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -9,6 +9,7 @@
         >
     <Window.Resources>
         <local:NameConverter x:Key="nameConverter"/>
+        <local:DurationConverter x:Key="durationConverter"/>
 
         <Style x:Key="RedFormatButton" TargetType="{x:Type Button}">
             <Setter Property="FontSize" Value="16"/>
@@ -68,7 +69,7 @@
         <CommandBinding Command="Save" CanExecute="SaveCommand_CanExecute" Executed="SaveCommand_Executed" />
         <CommandBinding Command="New" CanExecute="NewCommand_CanExecute" Executed="NewCommand_Executed" />
     </Window.CommandBindings>
-    
+
     <Canvas Name="mainCanvas" >
         <Border Height="20" Width="794" BorderBrush="#FFACACAC" BorderThickness="0,0,0,1">
             <DockPanel Background="#FFDDDDDD" Margin="0,0,0,0.2">
@@ -88,100 +89,138 @@
             </DockPanel>
         </Border>
 
-        <Button Name="buttonAdd" Width="80" Height="35" Content="Browse..." Click="ButtonAdd_Click" Canvas.Left="24" Canvas.Top="40"/>
+        <StackPanel Orientation="Vertical" Width="150" Canvas.Left="22" Canvas.Top="44" >
+            <StackPanel.Resources>
+                <Style TargetType="Button">
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="Width" Value="auto"/>
+                    <Setter Property="Height" Value="35"/>
+                    <Setter Property="Margin" Value="0 5 0 5"/>
+                </Style>
+
+                <Style TargetType="Image">
+                    <Setter Property="Width" Value="25"/>
+                    <Setter Property="Height" Value="25"/>
+                    <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
+                </Style>
+
+                <Style TargetType="TextBlock">
+                    <Setter Property="FontSize" Value="12"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                </Style>
+            </StackPanel.Resources>
+
+            <Button Name="buttonAdd" Click="ButtonAdd_Click">
+                <Grid FlowDirection="LeftToRight">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="50" />
+                        <ColumnDefinition Width="100" />
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.Column="0" Source="Images/buttonAdd.PNG"/>
+                    <TextBlock Grid.Column="1" Text="Add files" />
+                </Grid>
+            </Button>
+
+            <Button Name="buttonRemoveSelected" Width="auto" Height="30" Click="ButtonRemoveSelected_Click">
+                <Grid FlowDirection="LeftToRight">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="50" />
+                        <ColumnDefinition Width="100" />
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.Column="0" Source="Images/close.png"/>
+                    <TextBlock Grid.Column="1" Text="Remove" />
+                </Grid>
+            </Button>
+
+            <Button Name="buttonRemoveAll" Click="ButtonRemoveAll_Click">
+                <Grid FlowDirection="LeftToRight">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="50" />
+                        <ColumnDefinition Width="100" />
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.Column="0" Source="Images/close.png"/>
+                    <TextBlock Grid.Column="1" Text="Remove All"/>
+                </Grid>
+            </Button>
+
+            <Button Name="buttonSave" Width="auto" Height="30" Click="ButtonSave_Click">
+                <Grid  FlowDirection="LeftToRight">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="50" />
+                        <ColumnDefinition Width="100" />
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.Column="0" Source="Images/save.png"/>
+                    <TextBlock Grid.Column="1" Text="Save Playlist" />
+                </Grid>
+            </Button>
+
+            <Button Name="buttonLoad" Width="auto" Height="30" Click="ButtonLoad_Click">
+                <Grid FlowDirection="LeftToRight">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="50" />
+                        <ColumnDefinition Width="100" />
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.Column="0" Source="Images/folder.png"/>
+                    <TextBlock Grid.Column="1" Text="Load Playlist" />
+                </Grid>
+            </Button>
+        </StackPanel>
+
+        <Image Name="iamgeOfSong" Height="150" Canvas.Left="22" Canvas.Top="274" Width="150"/>
+
         <TextBlock Name="labelCurrentPlay" TextWrapping="Wrap" Text="Currently Playing" Width="auto" Canvas.Left="200" Canvas.Top="24"/>
+        
         <Border Canvas.Left="200" Canvas.Top="44">
-            <StackPanel Orientation="Vertical">
-                <ListView Name="listViewPlaylist" Width="auto" Height="330" SelectionMode="Single">
-                    <ListView.View>
-                        <GridView>
-                            <!--<GridViewColumn Header="No." Width="25" DisplayMemberBinding="{Binding id}" />-->
-                            <GridViewColumn Header="Name" Width="200" DisplayMemberBinding="{Binding Name, Converter={StaticResource nameConverter}}" />
+            <ListView Name="listViewPlaylist" Width="575" Height="357" SelectionMode="Single">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Name" Width="250" DisplayMemberBinding="{Binding Name, Converter={StaticResource nameConverter}}" />
+                        <GridViewColumn Header="Duration" Width="70" DisplayMemberBinding="{Binding Properties.Duration, Converter={StaticResource durationConverter}}" />
+                        <GridViewColumn Header="Artirt" Width="130" DisplayMemberBinding="{Binding Tag.FirstPerformer}" />
+                        <GridViewColumn Header="Album" Width="110" DisplayMemberBinding="{Binding Tag.Album}" />
 
-                        </GridView>
-                    </ListView.View>
-                    <ListView.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="Play this audio" Click="listBoxItemPlay_Click"/>
-                        </ContextMenu>
-                    </ListView.ContextMenu>
-                </ListView>
-                <StackPanel Margin="0,4,0,0" Orientation="Horizontal" FlowDirection="RightToLeft" >
-                    <Button Name="buttonRemoveAll" Width="auto" Height="30" Click="ButtonRemoveAll_Click">
-                        <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                            <Image Source="Images/close.png"
-                                   RenderOptions.BitmapScalingMode="HighQuality"
-                                   Margin="2,0,2,0" Height="24" Width="24"/>
-                            <TextBlock Text="Remove All" FontSize="12"
-                                       TextAlignment="Center" Padding="0,4,0,0"/>
-                        </StackPanel>
-                    </Button>
+                    </GridView>
+                </ListView.View>
+                <ListView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Play this audio" Click="listBoxItemPlay_Click"/>
+                    </ContextMenu>
+                </ListView.ContextMenu>
+            </ListView>
 
-                    <Button Name="buttonRemoveSelected" Width="auto" Height="30" Margin="5,0,0,0" Click="ButtonRemoveSelected_Click">
-                        <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                            <Image Source="Images/close.png"
-                                   RenderOptions.BitmapScalingMode="HighQuality"
-                                   Margin="2,0,2,0" Height="24" Width="24"/>
-                            <TextBlock Text="Remove Selected" FontSize="12"
-                                       TextAlignment="Center" Padding="0,4,0,0"/>
-                        </StackPanel>
-                    </Button>
-
-                    <Button Name="buttonSave" Width="auto" Height="30" Margin="5,0,0,0" Click="ButtonSave_Click">
-                        <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                            <Image Source="Images/save.png"
-                                   RenderOptions.BitmapScalingMode="HighQuality"
-                                   Margin="2,0,2,0" Height="24" Width="24"/>
-                            <TextBlock Text="Save Playlist" FontSize="12"
-                                       TextAlignment="Center" Padding="0,4,0,0"/>
-                        </StackPanel>
-                    </Button>
-
-                    <Button Name="buttonLoad" Width="auto" Height="30" Margin="5,0,0,0" Click="ButtonLoad_Click">
-                        <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                            <Image Source="Images/folder.png"
-                                   RenderOptions.BitmapScalingMode="HighQuality"
-                                   Margin="2,0,2,0" Height="24" Width="24"/>
-                            <TextBlock Text="Load Playlist" FontSize="12"
-                                       TextAlignment="Center" Padding="0,4,0,0"/>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-
-            </StackPanel>
         </Border>
-        <Slider Name="sliderSeeker" Canvas.Left="84" Canvas.Top="437" Width="661" Height="24" AutoToolTipPlacement="BottomRight"
+        <Slider Name="sliderSeeker" Canvas.Left="84" Canvas.Top="447" Width="661" Height="24" AutoToolTipPlacement="BottomRight"
                 Cursor="Hand" BorderThickness="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
                 UseLayoutRounding="True" ValueChanged="SliderSeeker_ValueChanged"/>
-        <Label Name="labelDuration" Canvas.Left="86" Content="00:01 / 03:26" Canvas.Top="470" 
+        <Label Name="labelDuration" Canvas.Left="86" Content="00:01 / 03:26" Canvas.Top="480" 
                BorderBrush="#FF908B8B" BorderThickness="1"/>
         <Button Name="buttonPrevious" Click="ButtonPrevious_Click"
-                FontSize="10" Canvas.Left="326" Canvas.Top="480" Height="40" Width="auto">
+                FontSize="10" Canvas.Left="326" Canvas.Top="490" Height="40" Width="auto">
             <Image Source="Images/previous_1.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </Button>
         <Button Name="buttonNext" Click="ButtonNext_Click"
-                FontSize="10" Height="40" Canvas.Left="438" Canvas.Top="480" Width="auto">
+                FontSize="10" Height="40" Canvas.Left="438" Canvas.Top="490" Width="auto">
             <Image Source="Images/next_1.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </Button>
         <Button Name="buttonPlay" Width="60" Height="auto" Click="ButtonPlay_Click"
-                Canvas.Left="373" Canvas.Top="470" FontSize="16">
+                Canvas.Left="373" Canvas.Top="480" FontSize="16">
             <Image Name="btnPlayIcon" Source="Images/play_1.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </Button>
-        <Slider Name="sliderVolume" Canvas.Left="619" Canvas.Top="460" Width="118" AutoToolTipPlacement="BottomRight"
+        <Slider Name="sliderVolume" Canvas.Left="619" Canvas.Top="470" Width="118" AutoToolTipPlacement="BottomRight"
                 Cursor="Hand" BorderThickness="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" 
                 UseLayoutRounding="True" Height="24"/>
-        <Button Name="buttonStop" Canvas.Left="255" Canvas.Top="480" Width="40" Height="auto"
+        <Button Name="buttonStop" Canvas.Left="255" Canvas.Top="490" Width="40" Height="auto"
                 FontSize="12" Click="ButtonStop_Click">
             <Image Source="Images/stop_1.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </Button>
-        <ToggleButton Name="buttonLoopMode" Height="36" Width="auto" Canvas.Left="499" Canvas.Top="482"
+        <ToggleButton Name="buttonLoopMode" Height="36" Width="auto" Canvas.Left="499" Canvas.Top="492"
                       ToolTip="Click to toggle between 'Loop all', 'Loop one' and 'No Loop'" IsThreeState="True"
                       IsChecked="{x:Null}" Checked="ButtonLoopMode_Checked" Unchecked="ButtonLoopMode_Unchecked"
                       Indeterminate="ButtonLoopMode_Indeterminate" Click="ButtonLoopMode_Click"
                       >
             <Image Name="btnLoopIcon" Source="Images/repeat_off.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </ToggleButton>
-        <ToggleButton Name="buttonShuffle" Height="36" Width="auto" Canvas.Left="541" Canvas.Top="482"
+        <ToggleButton Name="buttonShuffle" Height="36" Width="auto" Canvas.Left="541" Canvas.Top="492"
                       Checked="ButtonShuffle_Checked" Unchecked="ButtonShuffle_Unchecked" IsChecked="False"
                       ToolTip="Click to turn Random Mode On">
             <Image Name="randomModeIcon" Source="Images/shuffle_off.png" RenderOptions.BitmapScalingMode="HighQuality"/>
