@@ -40,7 +40,7 @@ namespace MP3_MusicPlayer
 
         MediaPlayer _player = new MediaPlayer();
         DispatcherTimer _timer;
-        BindingList<FileInfo> _fullPaths = new BindingList<FileInfo>();
+        BindingList<TagLib.File> _fullPaths = new BindingList<TagLib.File>();
         int _lastIndex = -1;
         private IKeyboardMouseEvents _hook;
 
@@ -116,9 +116,9 @@ namespace MP3_MusicPlayer
         private void PlaySelectedIndex(int i)
         {
             string filename;
-            if (_fullPaths[i].Extension == ".mp3")
+            if (_fullPaths[i].Properties.MediaTypes.ToString() == "Audio")
             {
-                filename = _fullPaths[i].FullName;
+                filename = _fullPaths[i].Name;
             }
             else
             {
@@ -127,11 +127,11 @@ namespace MP3_MusicPlayer
                 return;
             }
 
-            var name = _fullPaths[i].Name;
-            var converter = new NameConverter();
-            var shortname = converter.Convert(name, null, null, null);
-            Title = appName + $" : { shortname}";
-            labelCurrentPlay.Text = currently + shortname;
+            var playedName = _fullPaths[i].Name;
+            //var converter = new NameConverter();
+            //var shortname = converter.Convert(name, null, null, null);
+            Title = appName + $" : { _fullPaths[i].Tag.Title}";
+            //labelCurrentPlay.Text = currently + shortname;
 
             _player.Open(new Uri(filename, UriKind.Absolute));
 
@@ -229,7 +229,7 @@ namespace MP3_MusicPlayer
             {
                 foreach (var filename in screen.FileNames)
                 {
-                    var info = new FileInfo(filename);
+                    var info = TagLib.File.Create(filename);
                     _fullPaths.Add(info);
                 }
             }
@@ -237,8 +237,8 @@ namespace MP3_MusicPlayer
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            listBoxPlaylist.ItemsSource = _fullPaths;
-            LoadRecentPlayList();
+            listViewPlaylist.ItemsSource = _fullPaths;
+            //LoadRecentPlayList();
             _playIcon = new BitmapImage(new Uri("Images/play_1.png", UriKind.Relative));
             _pauseIcon = new BitmapImage(new Uri("Images/pause_1.png", UriKind.Relative));
             _loopModes = new BitmapImage[3];
@@ -346,7 +346,7 @@ namespace MP3_MusicPlayer
             for (int i = 0; i < count; i++)
             {
                 string filename = reader.ReadLine();
-                FileInfo info = new FileInfo(filename);
+                var info = TagLib.File.Create(filename);
                 _fullPaths.Add(info);
             }
 
@@ -374,9 +374,9 @@ namespace MP3_MusicPlayer
 
         private void listBoxItemPlay_Click(object sender, RoutedEventArgs e)
         {
-            var clickedItem = sender as System.Windows.Controls.MenuItem;
-            var selected = clickedItem.DataContext as FileInfo;
-            _lastIndex = _fullPaths.IndexOf(selected);
+            //var clickedItem = sender as System.Windows.Controls.MenuItem;
+            //var selected = clickedItem.DataContext as TagLib.File;
+            _lastIndex = listViewPlaylist.SelectedIndex; // _fullPaths.IndexOf(selected);
             ButtonStop_Click(null, null);
             PlaySelectedIndex(_lastIndex);           
         }
@@ -384,13 +384,13 @@ namespace MP3_MusicPlayer
         private void ButtonRemoveSelected_Click(object sender, RoutedEventArgs e)
         {
             var selecteds = new List<object>();
-            foreach (var item in listBoxPlaylist.SelectedItems)
+            foreach (var item in listViewPlaylist.SelectedItems)
             {
                 selecteds.Add(item);
             }
             foreach (var selected in selecteds)
             {
-                _fullPaths.Remove(selected as FileInfo);
+                _fullPaths.Remove(selected as TagLib.File);
             }
         }
 
@@ -454,8 +454,8 @@ namespace MP3_MusicPlayer
                 {
                     string line = reader.ReadLine();
                     if (line == null) break;
-                    FileInfo info = new FileInfo(line);
-                    if (info.Exists)
+                    var info = TagLib.File.Create(line);
+                    if (info!=null)
                     {
                         _fullPaths.Add(info);
                     }

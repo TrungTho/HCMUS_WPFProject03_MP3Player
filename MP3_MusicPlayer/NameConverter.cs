@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,13 +13,8 @@ namespace MP3_MusicPlayer
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var info = value as string;
-            var tokens = info.Split(new string[] { "." },
-                StringSplitOptions.None);
-            // Noi-buon-cua-anh.mp3
-            // ["Noi-buon-cua-anh", "mp3"]
-
-            return tokens[0];
+            TagLib.File tmpFile = TagLib.File.Create(value as string);
+            return tmpFile.Tag.Title;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

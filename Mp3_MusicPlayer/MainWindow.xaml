@@ -8,7 +8,7 @@
         Title="MP3 Music Player" Height="580" Width="800" Unloaded="Window_Unloaded" ResizeMode="CanMinimize" KeyDown="Window_KeyDown"
         >
     <Window.Resources>
-        <local:NameConverter x:Key="converter"/>
+        <local:NameConverter x:Key="nameConverter"/>
 
         <Style x:Key="RedFormatButton" TargetType="{x:Type Button}">
             <Setter Property="FontSize" Value="16"/>
@@ -89,22 +89,23 @@
         </Border>
 
         <Button Name="buttonAdd" Width="80" Height="35" Content="Browse..." Click="ButtonAdd_Click" Canvas.Left="24" Canvas.Top="40"/>
-        <TextBlock Name="labelCurrentPlay" TextWrapping="Wrap" Text="Currently Playing" Width="auto" Canvas.Left="352" Canvas.Top="24"/>
-        <Border Canvas.Left="350" Canvas.Top="44">
+        <TextBlock Name="labelCurrentPlay" TextWrapping="Wrap" Text="Currently Playing" Width="auto" Canvas.Left="200" Canvas.Top="24"/>
+        <Border Canvas.Left="200" Canvas.Top="44">
             <StackPanel Orientation="Vertical">
-                <ListBox Name="listBoxPlaylist" Width="auto" Height="330" SelectionMode="Multiple">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Name, Converter={StaticResource converter}}">
-                                <TextBlock.ContextMenu>
-                                    <ContextMenu>
-                                        <MenuItem Header="Play this audio" Click="listBoxItemPlay_Click"/>
-                                    </ContextMenu>
-                                </TextBlock.ContextMenu>
-                            </TextBlock>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                <ListView Name="listViewPlaylist" Width="auto" Height="330" SelectionMode="Single">
+                    <ListView.View>
+                        <GridView>
+                            <!--<GridViewColumn Header="No." Width="25" DisplayMemberBinding="{Binding id}" />-->
+                            <GridViewColumn Header="Name" Width="200" DisplayMemberBinding="{Binding Tag.Title}" />
+
+                        </GridView>
+                    </ListView.View>
+                    <ListView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Play this audio" Click="listBoxItemPlay_Click"/>
+                        </ContextMenu>
+                    </ListView.ContextMenu>
+                </ListView>
                 <StackPanel Margin="0,4,0,0" Orientation="Horizontal" FlowDirection="RightToLeft" >
                     <Button Name="buttonRemoveAll" Width="auto" Height="30" Click="ButtonRemoveAll_Click">
                         <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
@@ -150,7 +151,8 @@
             </StackPanel>
         </Border>
         <Slider Name="sliderSeeker" Canvas.Left="84" Canvas.Top="437" Width="661" Height="24" AutoToolTipPlacement="BottomRight"
-                Cursor="Hand" BorderThickness="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" UseLayoutRounding="True" ValueChanged="SliderSeeker_ValueChanged"/>
+                Cursor="Hand" BorderThickness="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                UseLayoutRounding="True" ValueChanged="SliderSeeker_ValueChanged"/>
         <Label Name="labelDuration" Canvas.Left="86" Content="00:01 / 03:26" Canvas.Top="470" 
                BorderBrush="#FF908B8B" BorderThickness="1"/>
         <Button Name="buttonPrevious" Click="ButtonPrevious_Click"
@@ -166,7 +168,8 @@
             <Image Name="btnPlayIcon" Source="Images/play_1.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </Button>
         <Slider Name="sliderVolume" Canvas.Left="619" Canvas.Top="460" Width="118" AutoToolTipPlacement="BottomRight"
-                Cursor="Hand" BorderThickness="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" UseLayoutRounding="True" Height="24"/>
+                Cursor="Hand" BorderThickness="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" 
+                UseLayoutRounding="True" Height="24"/>
         <Button Name="buttonStop" Canvas.Left="255" Canvas.Top="480" Width="40" Height="auto"
                 FontSize="12" Click="ButtonStop_Click">
             <Image Source="Images/stop_1.png" RenderOptions.BitmapScalingMode="HighQuality"/>
