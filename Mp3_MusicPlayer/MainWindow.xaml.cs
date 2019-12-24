@@ -127,10 +127,9 @@ namespace MP3_MusicPlayer
                 return;
             }
 
-            var playedName = _fullPaths[i].Name;
-            //var converter = new NameConverter();
-            //var shortname = converter.Convert(name, null, null, null);
-            Title = appName + $" : { _fullPaths[i].Tag.Title}";
+            var converter = new NameConverter();
+            var shortname = converter.Convert(filename, null, null, null);
+            Title = appName + $" : { shortname}";
             //labelCurrentPlay.Text = currently + shortname;
 
             _player.Open(new Uri(filename, UriKind.Absolute));

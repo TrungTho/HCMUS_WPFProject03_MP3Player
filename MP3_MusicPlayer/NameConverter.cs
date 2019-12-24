@@ -13,8 +13,14 @@ namespace MP3_MusicPlayer
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            TagLib.File tmpFile = TagLib.File.Create(value as string);
-            return tmpFile.Tag.Title;
+            string filePath = value as string;
+            string res = filePath.Substring(filePath.LastIndexOf("\\") + 1);
+
+            var info = TagLib.File.Create(filePath);
+            if (info.Tag.Title != null)
+                res = info.Tag.Title;
+
+            return res;                
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
