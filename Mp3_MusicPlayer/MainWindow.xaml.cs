@@ -431,13 +431,21 @@ namespace MP3_MusicPlayer
                 "About Us");
         }
 
+        private void playNewSong()
+        {
+            _lastIndex = listViewPlaylist.SelectedIndex;
+            ButtonStop_Click(null, null);
+            PlaySelectedIndex(_lastIndex);
+        }
+
         private void listBoxItemPlay_Click(object sender, RoutedEventArgs e)
         {
-            //var clickedItem = sender as System.Windows.Controls.MenuItem;
-            //var selected = clickedItem.DataContext as TagLib.File;
-            _lastIndex = listViewPlaylist.SelectedIndex; // _fullPaths.IndexOf(selected);
-            ButtonStop_Click(null, null);
-            PlaySelectedIndex(_lastIndex);           
+            playNewSong();
+        }
+
+        private void listBoxItemPlay_DoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            playNewSong();
         }
 
         private void ButtonRemoveSelected_Click(object sender, RoutedEventArgs e)

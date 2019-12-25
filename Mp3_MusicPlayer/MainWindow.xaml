@@ -89,7 +89,7 @@
             </DockPanel>
         </Border>
 
-        <StackPanel Orientation="Vertical" Width="150" Canvas.Left="22" Canvas.Top="44" >
+        <StackPanel Orientation="Vertical" Width="150" Canvas.Left="24" Canvas.Top="44" >
             <StackPanel.Resources>
                 <Style TargetType="Button">
                     <Setter Property="Background" Value="Transparent"/>
@@ -167,7 +167,7 @@
         </StackPanel>
 
         <!--<Image Name="iamgeOfSong" Height="150" Canvas.Left="22" Canvas.Top="274" Width="150"/>-->
-        <Ellipse Name="imageAnimation" RenderTransformOrigin="0.5, 0.5" Height="150" Stroke="Black" Width="150" Canvas.Left="22" Canvas.Top="272">
+        <Ellipse Name="imageAnimation" RenderTransformOrigin="0.5, 0.5" Height="150" Stroke="Black" Width="150" Canvas.Left="24" Canvas.Top="282">
             <Ellipse.Fill>
                 <ImageBrush ImageSource="Images/appIcon.png" RenderOptions.BitmapScalingMode="HighQuality"/>
             </Ellipse.Fill>
@@ -177,9 +177,11 @@
         </Ellipse>
 
         <TextBlock Name="labelCurrentPlay" TextWrapping="Wrap" Text="Currently Playing" Width="auto" Canvas.Left="200" Canvas.Top="24"/>
-        
+
         <Border Canvas.Left="200" Canvas.Top="44">
-            <ListView Name="listViewPlaylist" Width="575" Height="357" SelectionMode="Extended">
+            <ListView Name="listViewPlaylist" Width="575" Height="357" 
+                      MouseDoubleClick="listBoxItemPlay_DoubleClick"
+                      SelectionMode="Extended">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="Name" Width="250" DisplayMemberBinding="{Binding Name, Converter={StaticResource nameConverter}}" />
@@ -197,7 +199,7 @@
             </ListView>
 
         </Border>
-        <Slider Name="sliderSeeker" Canvas.Left="84" Canvas.Top="447" Width="661" Height="24" AutoToolTipPlacement="BottomRight"
+        <Slider Name="sliderSeeker" Canvas.Left="98" Canvas.Top="445" Width="663" Height="24" AutoToolTipPlacement="BottomRight"
                 Cursor="Hand" BorderThickness="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
                 UseLayoutRounding="True" ValueChanged="SliderSeeker_ValueChanged"/>
         <Label Name="labelDuration" Canvas.Left="86" Content="00:01 / 03:26" Canvas.Top="480" 
@@ -214,7 +216,7 @@
                 Canvas.Left="373" Canvas.Top="480" FontSize="16">
             <Image Name="btnPlayIcon" Source="Images/play_1.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </Button>
-        <Slider Name="sliderVolume" Canvas.Left="619" Canvas.Top="470" Width="118" AutoToolTipPlacement="BottomRight"
+        <Slider Name="sliderVolume" Canvas.Left="643" Canvas.Top="492" Width="118" AutoToolTipPlacement="BottomRight"
                 Cursor="Hand" BorderThickness="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" 
                 UseLayoutRounding="True" Height="24"/>
         <Button Name="buttonStop" Canvas.Left="255" Canvas.Top="490" Width="40" Height="auto"
@@ -233,6 +235,6 @@
                       ToolTip="Click to turn Random Mode On">
             <Image Name="randomModeIcon" Source="Images/shuffle_off.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </ToggleButton>
-        
+
     </Canvas>
 </Window>
