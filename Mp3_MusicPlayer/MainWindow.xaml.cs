@@ -42,7 +42,8 @@ namespace MP3_MusicPlayer
         MediaPlayer _player = new MediaPlayer();
         DispatcherTimer _timer;
         BindingList<TagLib.File> _fullPaths = new BindingList<TagLib.File>();
-        int _lastIndex = -1;
+        int _playingSong = -1;
+        int _lastPlayedSong = -1;
         private IKeyboardMouseEvents _hook;
         Storyboard story;
 
@@ -145,6 +146,8 @@ namespace MP3_MusicPlayer
         {
             //highlight playing song
             listViewPlaylist.SelectedIndex = i;
+            listViewPlaylist.ScrollIntoView(listViewPlaylist.SelectedItem);
+            _lastPlayedSong = i;
 
             string filename;
             if (_fullPaths[i].Properties.MediaTypes.ToString() == "Audio")
@@ -211,28 +214,41 @@ namespace MP3_MusicPlayer
             //_timer.Start();
         }
 
-        private void _player_MediaEnded(object sender, EventArgs e)
+        private void getNextSong(bool isNextSong)
         {
-            //_isPlaying = false;
-            //sliderSeeker.Value = 0;
-            ButtonStop_Click(null, null);
             if (_isRandomOrder == false)
             {
                 switch (_loopMode)
                 {
                     case 0: // loop off
-                        if (_lastIndex < _fullPaths.Count - 1)
-                            _lastIndex++;
-                        else
+                        if (isNextSong==true)
                         {
-                            
-                            return;
+                            if (_playingSong < _fullPaths.Count - 1)
+                                _playingSong++;
+                            else
+                            {
+                                return;
+                            }
+                        }
+                        else //get previous song
+                        {
+                            if (_playingSong > 0)
+                                _playingSong--;
+                            else
+                            {
+                                return;
+                            }
                         }
                         break;
                     case 1: // loop one
                         break;
                     case 2: // loop all
-                        _lastIndex = (_lastIndex + 1) % _fullPaths.Count;
+                        if (isNextSong == true)
+                        {
+                            _playingSong = (_playingSong +1 ) % _fullPaths.Count;
+                        }
+                        else
+                            _playingSong = (_playingSong - 1 + _fullPaths.Count) % _fullPaths.Count;
                         break;
                     default:
                         break;
@@ -241,9 +257,19 @@ namespace MP3_MusicPlayer
             else
             {
                 Random rng = new Random();
-                _lastIndex = rng.Next(_fullPaths.Count);
+                _playingSong = rng.Next(_fullPaths.Count);
             }
-            PlaySelectedIndex(_lastIndex);
+        }
+
+        private void _player_MediaEnded(object sender, EventArgs e)
+        {
+            //_isPlaying = false;
+            //sliderSeeker.Value = 0;
+            ButtonStop_Click(null, null);
+
+            getNextSong(true);
+
+            PlaySelectedIndex(_playingSong);
         }
 
         private void timer_Tick(object sender, EventArgs e)
@@ -335,18 +361,20 @@ namespace MP3_MusicPlayer
 
         private void playNewSong()
         {
-            _lastIndex = listViewPlaylist.SelectedIndex;
+            //_lastIndex = listViewPlaylist.SelectedIndex;
             ButtonStop_Click(null, null);
-            PlaySelectedIndex(_lastIndex);
+            PlaySelectedIndex(_playingSong);
         }
 
         private void listBoxItemPlay_Click(object sender, RoutedEventArgs e)
         {
+            _playingSong = listViewPlaylist.SelectedIndex;
             playNewSong();
         }
 
         private void listBoxItemPlay_DoubleClick(object sender, MouseButtonEventArgs e)
         {
+            _playingSong = listViewPlaylist.SelectedIndex;
             playNewSong();
         }
 
@@ -388,7 +416,7 @@ namespace MP3_MusicPlayer
         {
             string filename = "recent.txt";
             var writer = new StreamWriter(filename);
-            writer.WriteLine(_lastIndex);
+            writer.WriteLine(_playingSong);
             writer.WriteLine(_fullPaths.Count);
             foreach (var path in _fullPaths)
             {
@@ -414,7 +442,7 @@ namespace MP3_MusicPlayer
 
 
             // first line is the index last played music file
-            _lastIndex = int.Parse(reader.ReadLine());
+            _playingSong = int.Parse(reader.ReadLine());
 
 
             // second line is the number of files in the playlist
@@ -426,9 +454,9 @@ namespace MP3_MusicPlayer
                 _fullPaths.Add(info);
             }
 
-            if (_lastIndex >= 0)
+            if (_playingSong >= 0)
             {
-                var filename = _fullPaths[_lastIndex].Name;
+                var filename = _fullPaths[_playingSong].Name;
                 var converter = new NameConverter();
                 var shortname = converter.Convert(filename, null, null, null);
                 labelCurrentPlay.Text = currently + shortname;
@@ -515,9 +543,9 @@ namespace MP3_MusicPlayer
                 }
                 else
                 {
-                    if (_lastIndex < 0)
-                        _lastIndex = 0;
-                    PlaySelectedIndex(_lastIndex);
+                    if (_playingSong < 0)
+                        _playingSong = 0;
+                    PlaySelectedIndex(_playingSong);
                 }
                 resumeAnimation();
             }
@@ -539,40 +567,22 @@ namespace MP3_MusicPlayer
 
         private void ButtonPrevious_Click(object sender, RoutedEventArgs e)
         {
-            if (_lastIndex > 0)
-            {
-                _lastIndex--;
-                ButtonStop_Click(null, null);
-                PlaySelectedIndex(_lastIndex);
-            }
+            if (_isRandomOrder)
+                getNextSong(true);
             else
-            {
-                if (_loopMode == 2) // Loop All
-                {
-                    _lastIndex = _fullPaths.Count - 1;
-                    ButtonStop_Click(null, null);
-                    PlaySelectedIndex(_lastIndex);
-                }
-            }
+                _playingSong = (_playingSong - 1 + _fullPaths.Count) % _fullPaths.Count;
+
+            playNewSong();
         }
 
         private void ButtonNext_Click(object sender, RoutedEventArgs e)
         {
-            if (_lastIndex < _fullPaths.Count - 1)
-            {
-                _lastIndex++;
-                ButtonStop_Click(null, null);
-                PlaySelectedIndex(_lastIndex);
-            }
+            if (_isRandomOrder)
+                getNextSong(true);
             else
-            {
-                if (_loopMode == 2) // Loop All
-                {
-                    _lastIndex = 0;
-                    ButtonStop_Click(null, null);
-                    PlaySelectedIndex(_lastIndex);
-                }
-            }
+                _playingSong = (_playingSong + 1) % _fullPaths.Count;
+
+            playNewSong();
         }
 
         private void ButtonLoopMode_Checked(object sender, RoutedEventArgs e)
