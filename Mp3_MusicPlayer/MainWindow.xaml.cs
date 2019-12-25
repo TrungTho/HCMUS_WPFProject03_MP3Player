@@ -396,20 +396,62 @@ namespace MP3_MusicPlayer
 
         private void ButtonRemoveSelected_Click(object sender, RoutedEventArgs e)
         {
+            bool isPlayingSongSelected = false;
+
             var selecteds = new List<object>();
             foreach (var item in listViewPlaylist.SelectedItems)
             {
                 selecteds.Add(item);
+                if (_playingSong > -1 && item == listViewPlaylist.Items[_playingSong]) 
+                {
+                    isPlayingSongSelected = true;
+                }
             }
-            foreach (var selected in selecteds)
+
+            if (isPlayingSongSelected == true)
             {
-                _fullPaths.Remove(selected as TagLib.File);
+                MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("Remove playing song?", "Remove Selected", System.Windows.MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (messageBoxResult == MessageBoxResult.Yes)
+                {
+                    foreach (var selected in selecteds)
+                    {
+                        _fullPaths.Remove(selected as TagLib.File);
+                    }
+                    _lastPlayedSong = -1;
+                    _playingSong = -1;
+                    ButtonStop_Click(null, null);
+                }
             }
+            else
+            {
+                foreach (var selected in selecteds)
+                {
+                    _fullPaths.Remove(selected as TagLib.File);
+                }
+            }
+            
         }
 
         private void ButtonRemoveAll_Click(object sender, RoutedEventArgs e)
         {
-            _fullPaths.Clear();
+            if (_player.Source != null)
+            {
+                MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("Stop playing to remove all audio from list?", "Remove All", System.Windows.MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (messageBoxResult == MessageBoxResult.Yes)
+                {
+                    _fullPaths.Clear();
+                    _lastPlayedSong = -1;
+                    _playingSong = -1;
+                    ButtonStop_Click(null, null);
+                }
+            }
+            else
+            {
+                _fullPaths.Clear();
+                _lastPlayedSong = -1;
+                _playingSong = -1;
+                ButtonStop_Click(null, null);
+            }
         }
 
         private void SaveRecentPlayList()

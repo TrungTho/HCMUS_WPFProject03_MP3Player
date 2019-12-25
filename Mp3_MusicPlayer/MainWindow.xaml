@@ -194,6 +194,8 @@
                 <ListView.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Play this audio" Click="listBoxItemPlay_Click"/>
+                        <MenuItem Header="Remove Selected audio" Click="ButtonRemoveSelected_Click"/>
+                        <MenuItem Header="Remove All" Click="ButtonRemoveAll_Click"/>
                     </ContextMenu>
                 </ListView.ContextMenu>
             </ListView>
