@@ -44,7 +44,7 @@ namespace MP3_MusicPlayer
         BindingList<TagLib.File> _fullPaths = new BindingList<TagLib.File>();
         int _lastIndex = -1;
         private IKeyboardMouseEvents _hook;
-        BitmapImage defaultSongImage;
+        Storyboard story;
 
         bool _isPlaying = false;
         bool _isRandomOrder = false;
@@ -55,15 +55,20 @@ namespace MP3_MusicPlayer
         BitmapImage[] _loopModes;
         BitmapImage _randomOnIcon;
         BitmapImage _randomOffIcon;
+        BitmapImage defaultSongImage;
 
         public MainWindow()
         {
             InitializeComponent();
+
+            //init model
             _player.MediaOpened += _player_MediaOpened;
             _player.MediaEnded += _player_MediaEnded;
             _timer = new DispatcherTimer();
             _timer.Interval = TimeSpan.FromSeconds(1);
             _timer.Tick += timer_Tick;
+            story = new Storyboard();
+
 
             // Dang ky su kien hook
             _hook = Hook.GlobalEvents();
@@ -81,6 +86,7 @@ namespace MP3_MusicPlayer
            // startAnimation();
         }
 
+        /*UI function*/
         private void LoadImages()
         {
             //button
@@ -98,51 +104,39 @@ namespace MP3_MusicPlayer
             imageAnimation.Fill = new ImageBrush(defaultSongImage);
         }
 
-        private void _player_MediaOpened(object sender, EventArgs e)
+        private void startAnimation()
         {
-            sliderSeeker.Minimum = 0;
-            sliderSeeker.Maximum = _player.NaturalDuration.TimeSpan.TotalSeconds;
-            //sliderSeeker.SmallChange = 1;
-            //sliderSeeker.LargeChange = 10;
-        }
-
-        private void ButtonPlay_Click(object sender, RoutedEventArgs e)
-        {
-            //if (listBoxPlaylist.SelectedIndex >= 0)
-            //{
-            //    _lastIndex = listBoxPlaylist.SelectedIndex;
-            //    PlaySelectedIndex(_lastIndex);
-            //}
-            //else
-            //{
-            //    System.Windows.MessageBox.Show("No file selected!");
-            //    return;
-            //}
-
-            if (_isPlaying)
+            DoubleAnimation animation = new DoubleAnimation
             {
-                _player.Pause();
-                btnPlayIcon.Source = _playIcon;
-                _isPlaying = false;
+                From = 0,
+                To = 360,
+                Duration = new Duration(TimeSpan.FromSeconds(10)),
+                RepeatBehavior = RepeatBehavior.Forever
+            };
+
+            story.Children.Add(animation);
+            Storyboard.SetTargetName(animation, imageAnimation.Name);
+            Storyboard.SetTargetProperty(animation, new PropertyPath("(UIElement.RenderTransform).(RotateTransform.Angle)"));
+            story.Begin(this,true);
+        }
+               
+        private void pauseAnimation()
+        {
+            if (story != null)
+            {
+                story.Pause(this);
             }
-            else
-            {
-                if (_player.Source != null)
-                {
-                    _player.Play();
-                    btnPlayIcon.Source = _pauseIcon;
-                    _isPlaying = true;
-                    _timer.Start();
-                }
-                else
-                {
-                    if (_lastIndex < 0)
-                        _lastIndex = 0;
-                    PlaySelectedIndex(_lastIndex);
-                }
-            }           
         }
 
+        private void resumeAnimation()
+        {
+            if (story!=null)
+            {
+                story.Resume(this);
+            }
+        }
+
+        /*BUS function*/
         /// <summary>
         /// main function to play a song in listview
         /// </summary>
@@ -217,23 +211,6 @@ namespace MP3_MusicPlayer
             //_timer.Start();
         }
 
-        private void startAnimation()
-        {
-            DoubleAnimation animation = new DoubleAnimation
-            {
-                From = 0,
-                To = 360,
-                Duration = new Duration(TimeSpan.FromSeconds(10)),
-                RepeatBehavior = RepeatBehavior.Forever
-            };
-
-            var story = new Storyboard();
-            story.Children.Add(animation);
-            Storyboard.SetTargetName(animation, imageAnimation.Name);
-            Storyboard.SetTargetProperty(animation, new PropertyPath("(UIElement.RenderTransform).(RotateTransform.Angle)"));
-            story.Begin(this);
-        }
-
         private void _player_MediaEnded(object sender, EventArgs e)
         {
             //_isPlaying = false;
@@ -294,25 +271,13 @@ namespace MP3_MusicPlayer
             else
                 labelDuration.Content = "No file selected...";
         }
-        
-        private void ButtonAdd_Click(object sender, RoutedEventArgs e)
-        {
-            var screen = new Microsoft.Win32.OpenFileDialog();
-            screen.Title = "Add new music files to current playlist";
-            screen.Multiselect = true;
-            if (screen.ShowDialog() == true)
-            {
-                foreach (var filename in screen.FileNames)
-                {
-                    var info = TagLib.File.Create(filename);
-                    _fullPaths.Add(info);
-                }
-            }
-        }
 
-        private void Window_Unloaded(object sender, RoutedEventArgs e)
+        private void _player_MediaOpened(object sender, EventArgs e)
         {
-
+            sliderSeeker.Minimum = 0;
+            sliderSeeker.Maximum = _player.NaturalDuration.TimeSpan.TotalSeconds;
+            //sliderSeeker.SmallChange = 1;
+            //sliderSeeker.LargeChange = 10;
         }
 
         private void KeyUp_hook(object sender, System.Windows.Forms.KeyEventArgs e)
@@ -368,69 +333,6 @@ namespace MP3_MusicPlayer
             }
         }
 
-        private void SaveRecentPlayList()
-        {
-            string filename = "recent.txt";
-            var writer = new StreamWriter(filename);
-            writer.WriteLine(_lastIndex);
-            writer.WriteLine(_fullPaths.Count);
-            foreach (var path in _fullPaths)
-            {
-                writer.WriteLine(path);
-            }
-            writer.Close();
-        }
-
-        private void LoadRecentPlayList()
-        {
-			StreamReader reader;
-            try
-            {
-                reader = new StreamReader("recent.txt");
-            }
-            catch (FileNotFoundException)
-            {
-                //System.Windows.MessageBox.Show(ex.Message, "File Not Found!");
-                var writer = new StreamWriter("recent.txt");
-                writer.Close();
-                return;
-            }
-            
-
-            // first line is the index last played music file
-            _lastIndex = int.Parse(reader.ReadLine());
-            
-
-            // second line is the number of files in the playlist
-            int count = int.Parse(reader.ReadLine());
-            for (int i = 0; i < count; i++)
-            {
-                string filename = reader.ReadLine();
-                var info = TagLib.File.Create(filename);
-                _fullPaths.Add(info);
-            }
-
-            if (_lastIndex >= 0)
-            {
-                var filename = _fullPaths[_lastIndex].Name;
-                var converter = new NameConverter();
-                var shortname = converter.Convert(filename, null, null, null);
-                labelCurrentPlay.Text = currently + shortname;
-            }
-        }
-
-        private void FileExit_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
-        private void HelpAbout_Click(object sender, RoutedEventArgs e)
-        {
-            System.Windows.MessageBox.Show(this,
-                "Nguyễn Khánh Hoàng - 1712457\n      Trần Trung Thọ      - 1712798",
-                "About Us");
-        }
-
         private void playNewSong()
         {
             _lastIndex = listViewPlaylist.SelectedIndex;
@@ -446,6 +348,22 @@ namespace MP3_MusicPlayer
         private void listBoxItemPlay_DoubleClick(object sender, MouseButtonEventArgs e)
         {
             playNewSong();
+        }
+
+        /*Playlist button*/
+        private void ButtonAdd_Click(object sender, RoutedEventArgs e)
+        {
+            var screen = new Microsoft.Win32.OpenFileDialog();
+            screen.Title = "Add new music files to current playlist";
+            screen.Multiselect = true;
+            if (screen.ShowDialog() == true)
+            {
+                foreach (var filename in screen.FileNames)
+                {
+                    var info = TagLib.File.Create(filename);
+                    _fullPaths.Add(info);
+                }
+            }
         }
 
         private void ButtonRemoveSelected_Click(object sender, RoutedEventArgs e)
@@ -466,18 +384,55 @@ namespace MP3_MusicPlayer
             _fullPaths.Clear();
         }
 
-        private void ButtonShuffle_Checked(object sender, RoutedEventArgs e)
+        private void SaveRecentPlayList()
         {
-            _isRandomOrder = true;
-            randomModeIcon.Source = _randomOnIcon;
-            buttonShuffle.ToolTip = "Random: on";
+            string filename = "recent.txt";
+            var writer = new StreamWriter(filename);
+            writer.WriteLine(_lastIndex);
+            writer.WriteLine(_fullPaths.Count);
+            foreach (var path in _fullPaths)
+            {
+                writer.WriteLine(path);
+            }
+            writer.Close();
         }
 
-        private void ButtonShuffle_Unchecked(object sender, RoutedEventArgs e)
+        private void LoadRecentPlayList()
         {
-            _isRandomOrder = false;
-            randomModeIcon.Source = _randomOffIcon;
-            buttonShuffle.ToolTip = "Random: off";
+            StreamReader reader;
+            try
+            {
+                reader = new StreamReader("recent.txt");
+            }
+            catch (FileNotFoundException)
+            {
+                //System.Windows.MessageBox.Show(ex.Message, "File Not Found!");
+                var writer = new StreamWriter("recent.txt");
+                writer.Close();
+                return;
+            }
+
+
+            // first line is the index last played music file
+            _lastIndex = int.Parse(reader.ReadLine());
+
+
+            // second line is the number of files in the playlist
+            int count = int.Parse(reader.ReadLine());
+            for (int i = 0; i < count; i++)
+            {
+                string filename = reader.ReadLine();
+                var info = TagLib.File.Create(filename);
+                _fullPaths.Add(info);
+            }
+
+            if (_lastIndex >= 0)
+            {
+                var filename = _fullPaths[_lastIndex].Name;
+                var converter = new NameConverter();
+                var shortname = converter.Convert(filename, null, null, null);
+                labelCurrentPlay.Text = currently + shortname;
+            }
         }
 
         private void SliderSeeker_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -538,9 +493,40 @@ namespace MP3_MusicPlayer
             }
         }
 
+        /*Control button*/
+        private void ButtonPlay_Click(object sender, RoutedEventArgs e)
+        {
+            if (_isPlaying)
+            {
+                _player.Pause();
+                btnPlayIcon.Source = _playIcon;
+                _isPlaying = false;
+                //pauseAnimation();
+                story.Pause(this);
+            }
+            else
+            {
+                if (_player.Source != null)
+                {
+                    _player.Play();
+                    btnPlayIcon.Source = _pauseIcon;
+                    _isPlaying = true;
+                    _timer.Start();
+                }
+                else
+                {
+                    if (_lastIndex < 0)
+                        _lastIndex = 0;
+                    PlaySelectedIndex(_lastIndex);
+                }
+                resumeAnimation();
+            }
+        }
+
         private void ButtonStop_Click(object sender, RoutedEventArgs e)
         {
             _player.Stop();
+            pauseAnimation();
             sliderSeeker.Value = _player.Position.TotalSeconds;
             _isPlaying = false;
             _timer.Stop();
@@ -609,6 +595,33 @@ namespace MP3_MusicPlayer
             _loopMode = (_loopMode + 1 ) % 3;
             btnLoopIcon.Source = _loopModes[_loopMode];
             buttonLoopMode.ToolTip = loopModesHints[_loopMode];
+        }
+
+        private void ButtonShuffle_Checked(object sender, RoutedEventArgs e)
+        {
+            _isRandomOrder = true;
+            randomModeIcon.Source = _randomOnIcon;
+            buttonShuffle.ToolTip = "Random: on";
+        }
+
+        private void ButtonShuffle_Unchecked(object sender, RoutedEventArgs e)
+        {
+            _isRandomOrder = false;
+            randomModeIcon.Source = _randomOffIcon;
+            buttonShuffle.ToolTip = "Random: off";
+        }
+
+        /*Menu button*/
+        private void FileExit_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void HelpAbout_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.MessageBox.Show(this,
+                "Nguyễn Khánh Hoàng - 1712457\n      Trần Trung Thọ      - 1712798",
+                "About Us");
         }
 
         private void HelpShortcuts_Click(object sender, RoutedEventArgs e)

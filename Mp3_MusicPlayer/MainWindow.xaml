@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MP3_MusicPlayer"
         mc:Ignorable="d" Loaded="Window_Loaded" Closing="Window_Closing" Icon="Images/appIcon.png"
-        Title="MP3 Music Player" Height="580" Width="800" Unloaded="Window_Unloaded" ResizeMode="CanMinimize" KeyDown="Window_KeyDown"
+        Title="MP3 Music Player" Height="580" Width="800" ResizeMode="CanMinimize" KeyDown="Window_KeyDown"
         >
     <Window.Resources>
         <local:NameConverter x:Key="nameConverter"/>
@@ -202,7 +202,7 @@
         <Slider Name="sliderSeeker" Canvas.Left="98" Canvas.Top="445" Width="663" Height="24" AutoToolTipPlacement="BottomRight"
                 Cursor="Hand" BorderThickness="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
                 UseLayoutRounding="True" ValueChanged="SliderSeeker_ValueChanged"/>
-        <Label Name="labelDuration" Canvas.Left="86" Content="00:01 / 03:26" Canvas.Top="480" 
+        <Label Name="labelDuration" Canvas.Left="86" Content="00:00 / 00:00" Canvas.Top="480" 
                BorderBrush="#FF908B8B" BorderThickness="1"/>
         <Button Name="buttonPrevious" Click="ButtonPrevious_Click"
                 FontSize="10" Canvas.Left="326" Canvas.Top="490" Height="40" Width="auto">
