@@ -121,7 +121,7 @@
                 </Grid>
             </Button>
 
-            <Button Name="buttonRemoveSelected" Width="auto" Height="30" Click="ButtonRemoveSelected_Click">
+            <Button Name="buttonRemoveSelected" Width="auto" Click="ButtonRemoveSelected_Click">
                 <Grid FlowDirection="LeftToRight">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="50" />
@@ -143,7 +143,7 @@
                 </Grid>
             </Button>
 
-            <Button Name="buttonSave" Width="auto" Height="30" Click="ButtonSave_Click">
+            <Button Name="buttonSave" Width="auto" Click="ButtonSave_Click">
                 <Grid  FlowDirection="LeftToRight">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="50" />
@@ -154,7 +154,7 @@
                 </Grid>
             </Button>
 
-            <Button Name="buttonLoad" Width="auto" Height="30" Click="ButtonLoad_Click">
+            <Button Name="buttonLoad" Width="auto" Click="ButtonLoad_Click">
                 <Grid FlowDirection="LeftToRight">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="50" />
@@ -166,12 +166,20 @@
             </Button>
         </StackPanel>
 
-        <Image Name="iamgeOfSong" Height="150" Canvas.Left="22" Canvas.Top="274" Width="150"/>
+        <!--<Image Name="iamgeOfSong" Height="150" Canvas.Left="22" Canvas.Top="274" Width="150"/>-->
+        <Ellipse Name="imageAnimation" RenderTransformOrigin="0.5, 0.5" Height="150" Stroke="Black" Width="150" Canvas.Left="22" Canvas.Top="272">
+            <Ellipse.Fill>
+                <ImageBrush ImageSource="Images/appIcon.png" RenderOptions.BitmapScalingMode="HighQuality"/>
+            </Ellipse.Fill>
+            <Ellipse.RenderTransform>
+                <RotateTransform Angle="0" />
+            </Ellipse.RenderTransform>
+        </Ellipse>
 
         <TextBlock Name="labelCurrentPlay" TextWrapping="Wrap" Text="Currently Playing" Width="auto" Canvas.Left="200" Canvas.Top="24"/>
         
         <Border Canvas.Left="200" Canvas.Top="44">
-            <ListView Name="listViewPlaylist" Width="575" Height="357" SelectionMode="Single">
+            <ListView Name="listViewPlaylist" Width="575" Height="357" SelectionMode="Extended">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="Name" Width="250" DisplayMemberBinding="{Binding Name, Converter={StaticResource nameConverter}}" />
@@ -225,5 +233,6 @@
                       ToolTip="Click to turn Random Mode On">
             <Image Name="randomModeIcon" Source="Images/shuffle_off.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </ToggleButton>
+        
     </Canvas>
 </Window>

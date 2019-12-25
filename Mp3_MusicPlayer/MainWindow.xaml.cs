@@ -13,6 +13,7 @@ using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -43,6 +44,7 @@ namespace MP3_MusicPlayer
         BindingList<TagLib.File> _fullPaths = new BindingList<TagLib.File>();
         int _lastIndex = -1;
         private IKeyboardMouseEvents _hook;
+        BitmapImage defaultSongImage;
 
         bool _isPlaying = false;
         bool _isRandomOrder = false;
@@ -66,6 +68,34 @@ namespace MP3_MusicPlayer
             // Dang ky su kien hook
             _hook = Hook.GlobalEvents();
             _hook.KeyUp += KeyUp_hook;
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            listViewPlaylist.ItemsSource = _fullPaths;
+
+            //LoadRecentPlayList();
+
+            LoadImages();
+
+           // startAnimation();
+        }
+
+        private void LoadImages()
+        {
+            //button
+            _playIcon = new BitmapImage(new Uri("Images/play_1.png", UriKind.Relative));
+            _pauseIcon = new BitmapImage(new Uri("Images/pause_1.png", UriKind.Relative));
+            _loopModes = new BitmapImage[3];
+            _loopModes[0] = new BitmapImage(new Uri("Images/repeat_off.png", UriKind.Relative));
+            _loopModes[1] = new BitmapImage(new Uri("Images/repeat_one.png", UriKind.Relative));
+            _loopModes[2] = new BitmapImage(new Uri("Images/repeat_all.png", UriKind.Relative));
+            _randomOnIcon = new BitmapImage(new Uri("Images/shuffle_on.png", UriKind.Relative));
+            _randomOffIcon = new BitmapImage(new Uri("Images/shuffle_off.png", UriKind.Relative));
+
+            //default song's image
+            defaultSongImage = new BitmapImage(new Uri("Images/appIcon.png", UriKind.Relative));
+            imageAnimation.Fill = new ImageBrush(defaultSongImage);
         }
 
         private void _player_MediaOpened(object sender, EventArgs e)
@@ -113,6 +143,10 @@ namespace MP3_MusicPlayer
             }           
         }
 
+        /// <summary>
+        /// main function to play a song in listview
+        /// </summary>
+        /// <param name="i">index of song in source of truth - fullpath[]</param>
         private void PlaySelectedIndex(int i)
         {
             //highlight playing song
@@ -134,6 +168,29 @@ namespace MP3_MusicPlayer
             var shortname = converter.Convert(filename, null, null, null);
             Title = appName + $" : { shortname}";
             //labelCurrentPlay.Text = currently + shortname;
+
+            //load image of song to animation section
+            try
+            {
+                // Load image data in MemoryStream
+                TagLib.IPicture pic = _fullPaths[i].Tag.Pictures[0];
+                MemoryStream ms = new MemoryStream(pic.Data.Data);
+                ms.Seek(0, SeekOrigin.Begin);
+
+                // ImageSource for System.Windows.Controls.Image
+                BitmapImage bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.StreamSource = ms;
+                bitmap.EndInit();
+
+                imageAnimation.Fill = new ImageBrush(bitmap);
+            }
+            catch (Exception e) //can't find image of song
+            {
+                imageAnimation.Fill = new ImageBrush(defaultSongImage);
+            }
+
+            startAnimation();
 
             _player.Open(new Uri(filename, UriKind.Absolute));
 
@@ -158,7 +215,23 @@ namespace MP3_MusicPlayer
             //_player.Play();
             //_isPlaying = true;
             //_timer.Start();
+        }
 
+        private void startAnimation()
+        {
+            DoubleAnimation animation = new DoubleAnimation
+            {
+                From = 0,
+                To = 360,
+                Duration = new Duration(TimeSpan.FromSeconds(10)),
+                RepeatBehavior = RepeatBehavior.Forever
+            };
+
+            var story = new Storyboard();
+            story.Children.Add(animation);
+            Storyboard.SetTargetName(animation, imageAnimation.Name);
+            Storyboard.SetTargetProperty(animation, new PropertyPath("(UIElement.RenderTransform).(RotateTransform.Angle)"));
+            story.Begin(this);
         }
 
         private void _player_MediaEnded(object sender, EventArgs e)
@@ -237,20 +310,6 @@ namespace MP3_MusicPlayer
             }
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            listViewPlaylist.ItemsSource = _fullPaths;
-            //LoadRecentPlayList();
-            _playIcon = new BitmapImage(new Uri("Images/play_1.png", UriKind.Relative));
-            _pauseIcon = new BitmapImage(new Uri("Images/pause_1.png", UriKind.Relative));
-            _loopModes = new BitmapImage[3];
-            _loopModes[0] = new BitmapImage(new Uri("Images/repeat_off.png", UriKind.Relative));
-            _loopModes[1] = new BitmapImage(new Uri("Images/repeat_one.png", UriKind.Relative));
-            _loopModes[2] = new BitmapImage(new Uri("Images/repeat_all.png", UriKind.Relative));
-            _randomOnIcon = new BitmapImage(new Uri("Images/shuffle_on.png", UriKind.Relative));
-            _randomOffIcon = new BitmapImage(new Uri("Images/shuffle_off.png", UriKind.Relative));
-        }
-
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
 
@@ -292,7 +351,6 @@ namespace MP3_MusicPlayer
                 ButtonAdd_Click(buttonAdd, null);
             }
         }
-
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
@@ -361,7 +419,6 @@ namespace MP3_MusicPlayer
             }
         }
 
-
         private void FileExit_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
@@ -424,23 +481,30 @@ namespace MP3_MusicPlayer
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
         {
-            var screen = new Microsoft.Win32.SaveFileDialog();
-            //screen.AddExtension = true;
-            if (screen.ShowDialog() == true)
+            if (_fullPaths.Count!=0)
             {
-                string playlist = screen.FileName;
-                var writer = new StreamWriter(playlist);
-                foreach (var path in _fullPaths)
+                var screen = new Microsoft.Win32.SaveFileDialog();
+                //screen.AddExtension = true;
+                if (screen.ShowDialog() == true)
                 {
-                    writer.WriteLine(path);
-                }
+                    string playlist = screen.FileName;
+                    var writer = new StreamWriter(playlist);
+                    foreach (var path in _fullPaths)
+                    {
+                        writer.WriteLine(path);
+                    }
 
-                writer.Close();
-                //if (fileinfo.Exists)
-                //{
-                //    System.Windows.MessageBox.Show("Please specify a different filename", "Duplicate Filename Found");
-                //}
-                //else { }
+                    writer.Close();
+                    //if (fileinfo.Exists)
+                    //{
+                    //    System.Windows.MessageBox.Show("Please specify a different filename", "Duplicate Filename Found");
+                    //}
+                    //else { }
+                }
+            }
+            else
+            {
+                System.Windows.MessageBox.Show("Empty playlist!!!");
             }
         }
 
