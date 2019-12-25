@@ -46,6 +46,7 @@ namespace MP3_MusicPlayer
         int _lastPlayedSong = -1;
         private IKeyboardMouseEvents _hook;
         Storyboard story;
+        BindingList<string> listOldPlaylist;
 
         bool _isPlaying = false;
         bool _isRandomOrder = false;
@@ -80,11 +81,9 @@ namespace MP3_MusicPlayer
         {
             listViewPlaylist.ItemsSource = _fullPaths;
 
-            //LoadRecentPlayList();
-
             LoadImages();
 
-           // startAnimation();
+            LoadRecentPlayList();
         }
 
         /*UI function*/
@@ -157,7 +156,7 @@ namespace MP3_MusicPlayer
             else
             {
                 System.Windows.MessageBox.Show("The file you have chosen is not an MP3 file",
-                    "Invalid Extension");
+                    "Invalid Extension", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -166,6 +165,30 @@ namespace MP3_MusicPlayer
             Title = appName + $" : { shortname}";
             //labelCurrentPlay.Text = currently + shortname;
 
+            loadAlbumCover(i);
+
+            startAnimation();
+
+            _player.Open(new Uri(filename, UriKind.Absolute));
+
+            // Tạm ngưng 0.5 s trước khi chuyển sang bài kế tiếp
+            System.Threading.Thread.Sleep(500);
+            TimeSpan duration;
+            if (_player.NaturalDuration.HasTimeSpan)
+            {
+                duration = _player.NaturalDuration.TimeSpan;
+            }
+            else
+            {
+                System.Windows.MessageBox.Show("Error occured!");
+                return;
+            }
+
+            ButtonPlay_Click(buttonPlay, null);
+        }
+
+        private void loadAlbumCover(int i)
+        {
             //load image of song to animation section
             try
             {
@@ -186,32 +209,6 @@ namespace MP3_MusicPlayer
             {
                 imageAnimation.Fill = new ImageBrush(defaultSongImage);
             }
-
-            startAnimation();
-
-            _player.Open(new Uri(filename, UriKind.Absolute));
-
-            // Tạm ngưng 0.5 s trước khi chuyển sang bài kế tiếp
-            System.Threading.Thread.Sleep(500);
-            TimeSpan duration;
-            if (_player.NaturalDuration.HasTimeSpan)
-            {
-                duration = _player.NaturalDuration.TimeSpan;
-                //sliderSeeker.Minimum = 0;
-                //sliderSeeker.Maximum = duration.TotalSeconds;
-            }
-            else
-            {
-                System.Windows.MessageBox.Show("Error occured!");
-                return;
-            }
-            //var testDuration = new TimeSpan(duration.Hours, duration.Minutes, duration.Seconds - 20);
-            //_player.Position = testDuration;
-
-            ButtonPlay_Click(buttonPlay, null);
-            //_player.Play();
-            //_isPlaying = true;
-            //_timer.Start();
         }
 
         private void getNextSong(bool isNextSong)
@@ -419,6 +416,7 @@ namespace MP3_MusicPlayer
                     }
                     _lastPlayedSong = -1;
                     _playingSong = -1;
+                    imageAnimation.Fill = new ImageBrush(defaultSongImage);
                     ButtonStop_Click(null, null);
                 }
             }
@@ -439,30 +437,26 @@ namespace MP3_MusicPlayer
                 MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("Stop playing to remove all audio from list?", "Remove All", System.Windows.MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 if (messageBoxResult == MessageBoxResult.Yes)
                 {
-                    _fullPaths.Clear();
-                    _lastPlayedSong = -1;
-                    _playingSong = -1;
-                    ButtonStop_Click(null, null);
+                    resetPlaylist();
                 }
             }
             else
             {
-                _fullPaths.Clear();
-                _lastPlayedSong = -1;
-                _playingSong = -1;
-                ButtonStop_Click(null, null);
+                resetPlaylist();
             }
         }
 
         private void SaveRecentPlayList()
         {
             string filename = "recent.txt";
+
             var writer = new StreamWriter(filename);
             writer.WriteLine(_playingSong);
             writer.WriteLine(_fullPaths.Count);
+
             foreach (var path in _fullPaths)
             {
-                writer.WriteLine(path);
+                writer.WriteLine(path.Name);
             }
             writer.Close();
         }
@@ -473,6 +467,27 @@ namespace MP3_MusicPlayer
             try
             {
                 reader = new StreamReader("recent.txt");
+                // first line is the index last played music file
+                _playingSong = int.Parse(reader.ReadLine());
+
+
+                // second line is the number of files in the playlist
+                int count = int.Parse(reader.ReadLine());
+                for (int i = 0; i < count; i++)
+                {
+                    string filename = reader.ReadLine();
+                    var info = TagLib.File.Create(filename);
+                    _fullPaths.Add(info);
+                }
+
+                if (_playingSong >= 0)
+                {
+                    var filename = _fullPaths[_playingSong].Name;
+                    var converter = new NameConverter();
+                    var shortname = converter.Convert(filename, null, null, null);
+                    Title = appName + $" : { shortname}";
+                    loadAlbumCover(_playingSong);
+                }
             }
             catch (FileNotFoundException)
             {
@@ -480,28 +495,6 @@ namespace MP3_MusicPlayer
                 var writer = new StreamWriter("recent.txt");
                 writer.Close();
                 return;
-            }
-
-
-            // first line is the index last played music file
-            _playingSong = int.Parse(reader.ReadLine());
-
-
-            // second line is the number of files in the playlist
-            int count = int.Parse(reader.ReadLine());
-            for (int i = 0; i < count; i++)
-            {
-                string filename = reader.ReadLine();
-                var info = TagLib.File.Create(filename);
-                _fullPaths.Add(info);
-            }
-
-            if (_playingSong >= 0)
-            {
-                var filename = _fullPaths[_playingSong].Name;
-                var converter = new NameConverter();
-                var shortname = converter.Convert(filename, null, null, null);
-                labelCurrentPlay.Text = currently + shortname;
             }
         }
 
@@ -541,25 +534,60 @@ namespace MP3_MusicPlayer
             }
         }
 
-        private void ButtonLoad_Click(object sender, RoutedEventArgs e)
+        private void resetPlaylist()
         {
             _fullPaths.Clear();
-            var screen = new Microsoft.Win32.OpenFileDialog();
-            if (screen.ShowDialog() == true)
+            _lastPlayedSong = -1;
+            _playingSong = -1;
+            imageAnimation.Fill = new ImageBrush(defaultSongImage);
+            ButtonStop_Click(null, null);
+        }
+
+        private void ButtonLoad_Click(object sender, RoutedEventArgs e)
+        {
+            if (_fullPaths.Count != 0)
             {
-                string playlist = screen.FileName;
-                var reader = new StreamReader(playlist);
-                do
+                MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("Remove present playlist and load new one?", "Load Playlist", System.Windows.MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (messageBoxResult == MessageBoxResult.Yes)
                 {
-                    string line = reader.ReadLine();
-                    if (line == null) break;
-                    var info = TagLib.File.Create(line);
-                    if (info!=null)
+                    resetPlaylist();
+
+                    var screen = new Microsoft.Win32.OpenFileDialog();
+                    if (screen.ShowDialog() == true)
                     {
-                        _fullPaths.Add(info);
+                        string playlist = screen.FileName;
+                        var reader = new StreamReader(playlist);
+                        do
+                        {
+                            string line = reader.ReadLine();
+                            if (line == null) break;
+                            var info = TagLib.File.Create(line);
+                            if (info != null)
+                            {
+                                _fullPaths.Add(info);
+                            }
+                        } while (true);
                     }
-                } while (true);
-                    
+                }
+            }
+            else
+            {
+                var screen = new Microsoft.Win32.OpenFileDialog();
+                if (screen.ShowDialog() == true)
+                {
+                    string playlist = screen.FileName;
+                    var reader = new StreamReader(playlist);
+                    do
+                    {
+                        string line = reader.ReadLine();
+                        if (line == null) break;
+                        var info = TagLib.File.Create(line);
+                        if (info != null)
+                        {
+                            _fullPaths.Add(info);
+                        }
+                    } while (true);
+                }
             }
         }
 
@@ -714,6 +742,11 @@ namespace MP3_MusicPlayer
         private void SaveCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ButtonSave_Click(buttonSave, null);
+        }
+
+        private void ListboxOldPlaylist_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
         }
     }
 }

@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MP3_MusicPlayer"
+        xmlns:wpfx1="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d" Loaded="Window_Loaded" Closing="Window_Closing" Icon="Images/appIcon.png"
         Title="MP3 Music Player" Height="580" Width="800" ResizeMode="CanMinimize" KeyDown="Window_KeyDown"
         >
@@ -153,8 +154,9 @@
                     <TextBlock Grid.Column="1" Text="Save Playlist" />
                 </Grid>
             </Button>
-
-            <Button Name="buttonLoad" Width="auto" Click="ButtonLoad_Click">
+                
+            <wpfx1:DropDownButton Name="buttonLoad" Width="auto" Height="35"
+                                  Background="Transparent">
                 <Grid FlowDirection="LeftToRight">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="50" />
@@ -163,10 +165,15 @@
                     <Image Grid.Column="0" Source="Images/folder.png"/>
                     <TextBlock Grid.Column="1" Text="Load Playlist" />
                 </Grid>
-            </Button>
+                <wpfx1:DropDownButton.DropDownContent>
+                    <ListBox Name="listboxOldPlaylist" Width="auto" SelectionChanged="ListboxOldPlaylist_SelectionChanged">
+                        
+                    </ListBox>
+                </wpfx1:DropDownButton.DropDownContent>
+
+            </wpfx1:DropDownButton>
         </StackPanel>
 
-        <!--<Image Name="iamgeOfSong" Height="150" Canvas.Left="22" Canvas.Top="274" Width="150"/>-->
         <Ellipse Name="imageAnimation" RenderTransformOrigin="0.5, 0.5" Height="150" Stroke="Black" Width="150" Canvas.Left="24" Canvas.Top="282">
             <Ellipse.Fill>
                 <ImageBrush ImageSource="Images/appIcon.png" RenderOptions.BitmapScalingMode="HighQuality"/>
@@ -176,7 +183,7 @@
             </Ellipse.RenderTransform>
         </Ellipse>
 
-        <TextBlock Name="labelCurrentPlay" TextWrapping="Wrap" Text="Currently Playing" Width="auto" Canvas.Left="200" Canvas.Top="24"/>
+        <!--<TextBlock Name="labelCurrentPlay" TextWrapping="Wrap" Text="Currently Playing" Width="auto" Canvas.Left="200" Canvas.Top="24"/>-->
 
         <Border Canvas.Left="200" Canvas.Top="44">
             <ListView Name="listViewPlaylist" Width="575" Height="357" 
@@ -194,7 +201,7 @@
                 <ListView.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Play this audio" Click="listBoxItemPlay_Click"/>
-                        <MenuItem Header="Remove Selected audio" Click="ButtonRemoveSelected_Click"/>
+                        <MenuItem Header="Remove selected" Click="ButtonRemoveSelected_Click"/>
                         <MenuItem Header="Remove All" Click="ButtonRemoveAll_Click"/>
                     </ContextMenu>
                 </ListView.ContextMenu>
