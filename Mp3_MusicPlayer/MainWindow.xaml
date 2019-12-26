@@ -204,7 +204,7 @@
 
         <!--<TextBlock Name="labelCurrentPlay" TextWrapping="Wrap" Text="Currently Playing" Width="auto" Canvas.Left="200" Canvas.Top="24"/>-->
 
-        <Border Canvas.Left="200" Canvas.Top="44">
+        <Border Canvas.Left="196" Canvas.Top="44">
             <ListView Name="listViewPlaylist" Width="680" Height="357" 
                       MouseDoubleClick="listBoxItemPlay_DoubleClick"
                       SelectionMode="Extended">
