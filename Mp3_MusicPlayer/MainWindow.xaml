@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:MP3_MusicPlayer"
         xmlns:wpfx1="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d" Loaded="Window_Loaded" Closing="Window_Closing" Icon="Images/appIcon.png"
-        Title="MP3 Music Player" Height="580" Width="800" ResizeMode="CanMinimize" KeyDown="Window_KeyDown"
+        Title="MP3 Music Player" Height="590" Width="900" ResizeMode="CanMinimize" KeyDown="Window_KeyDown"
         >
     <Window.Resources>
         <local:NameConverter x:Key="nameConverter"/>
@@ -78,7 +78,7 @@
                 <Setter Property="BorderBrush" Value="Transparent"/>
             </Style>
         </Canvas.Resources>
-        <Border Height="20" Width="794" BorderBrush="#FFACACAC" BorderThickness="0,0,0,1">
+        <Border Height="20" Width="894" BorderBrush="#FFACACAC" BorderThickness="0,0,0,1">
             <DockPanel Background="#FFDDDDDD" Margin="0,0,0,0.2">
                 <Menu DockPanel.Dock="Top">
                     <MenuItem Header="_File" >
@@ -205,14 +205,14 @@
         <!--<TextBlock Name="labelCurrentPlay" TextWrapping="Wrap" Text="Currently Playing" Width="auto" Canvas.Left="200" Canvas.Top="24"/>-->
 
         <Border Canvas.Left="200" Canvas.Top="44">
-            <ListView Name="listViewPlaylist" Width="575" Height="357" 
+            <ListView Name="listViewPlaylist" Width="680" Height="357" 
                       MouseDoubleClick="listBoxItemPlay_DoubleClick"
                       SelectionMode="Extended">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="Name" Width="250" DisplayMemberBinding="{Binding Name, Converter={StaticResource nameConverter}}" />
                         <GridViewColumn Header="Duration" Width="70" DisplayMemberBinding="{Binding Properties.Duration, Converter={StaticResource durationConverter}}" />
-                        <GridViewColumn Header="Artirt" Width="130" DisplayMemberBinding="{Binding Tag.FirstPerformer}" />
+                        <GridViewColumn Header="Artist" Width="130" DisplayMemberBinding="{Binding Tag.FirstPerformer}" />
                         <GridViewColumn Header="Album" Width="110" DisplayMemberBinding="{Binding Tag.Album}" />
 
                     </GridView>

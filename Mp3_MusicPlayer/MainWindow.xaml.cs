@@ -634,7 +634,8 @@ namespace MP3_MusicPlayer
         {
             if (_fullPaths.Count != 0)
             {
-                MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("Remove present playlist and load new one?", "Load Playlist", System.Windows.MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("Remove present playlist and load new one?", "Load Playlist",
+                    System.Windows.MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 if (messageBoxResult == MessageBoxResult.Yes)
                 {
                     resetPlaylist();
