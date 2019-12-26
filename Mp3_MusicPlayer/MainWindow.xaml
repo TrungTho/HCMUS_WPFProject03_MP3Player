@@ -166,9 +166,22 @@
                     <TextBlock Grid.Column="1" Text="Load Playlist" />
                 </Grid>
                 <wpfx1:DropDownButton.DropDownContent>
-                    <ListBox Name="listboxOldPlaylist" Width="auto" SelectionChanged="ListboxOldPlaylist_SelectionChanged">
-                        
-                    </ListBox>
+                    <StackPanel Width="150" Height="auto" Background="Transparent">
+                        <ListBox Name="listboxOldPlaylist" Width="150"
+                                 Height="80"
+                                 SelectionChanged="ListboxOldPlaylist_SelectionChanged">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource nameConverter}}"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <Separator/>
+                        <Button Content="Browse..." Width="auto" 
+                                Background="Transparent" Height="auto"
+                                BorderBrush="Transparent"
+                                Click="ButtonLoad_Click"/>
+                    </StackPanel>
                 </wpfx1:DropDownButton.DropDownContent>
 
             </wpfx1:DropDownButton>

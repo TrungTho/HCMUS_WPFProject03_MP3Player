@@ -16,11 +16,19 @@ namespace MP3_MusicPlayer
             string filePath = value as string;
             string res = filePath.Substring(filePath.LastIndexOf("\\")+1);
 
-            var info = TagLib.File.Create(filePath);
-            if (info.Tag.Title != null)
-                res = info.Tag.Title;
-            else //remove extension name
-                res = res.Substring(0, res.LastIndexOf("."));
+            try
+            {
+                var info = TagLib.File.Create(filePath);
+
+                if (info.Tag.Title != null)
+                    res = info.Tag.Title;
+                else //remove extension name
+                    res = res.Substring(0, res.LastIndexOf("."));
+            }
+            catch (Exception)
+            {
+
+            }
 
             return res;                
         }

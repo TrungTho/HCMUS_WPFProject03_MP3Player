@@ -47,6 +47,7 @@ namespace MP3_MusicPlayer
         private IKeyboardMouseEvents _hook;
         Storyboard story;
         BindingList<string> listOldPlaylist;
+        Object playedItem;
 
         bool _isPlaying = false;
         bool _isRandomOrder = false;
@@ -70,6 +71,8 @@ namespace MP3_MusicPlayer
             _timer.Interval = TimeSpan.FromSeconds(1);
             _timer.Tick += timer_Tick;
             story = new Storyboard();
+            listOldPlaylist = new BindingList<string>();
+            playedItem = new object();
 
 
             // Dang ky su kien hook
@@ -83,7 +86,7 @@ namespace MP3_MusicPlayer
 
             LoadImages();
 
-            LoadRecentPlayList();
+            LoadRecentPlayList("recent.txt");
         }
 
         /*UI function*/
@@ -147,6 +150,7 @@ namespace MP3_MusicPlayer
             listViewPlaylist.SelectedIndex = i;
             listViewPlaylist.ScrollIntoView(listViewPlaylist.SelectedItem);
             _lastPlayedSong = i;
+            playedItem = listViewPlaylist.SelectedItem;
 
             string filename;
             if (_fullPaths[i].Properties.MediaTypes.ToString() == "Audio")
@@ -350,7 +354,7 @@ namespace MP3_MusicPlayer
             }
             else
             {
-                SaveRecentPlayList();
+                SaveRecentPlayList("recent.txt");
                 _hook.KeyUp -= KeyUp_hook;
                 _hook.Dispose();
             }
@@ -375,6 +379,27 @@ namespace MP3_MusicPlayer
             playNewSong();
         }
 
+        private void ListboxOldPlaylist_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (listboxOldPlaylist.SelectedIndex < 0 || listboxOldPlaylist.SelectedIndex >= listOldPlaylist.Count)
+                return;
+
+            if (_fullPaths.Count == 0)
+            {
+                string filepath = listOldPlaylist[listboxOldPlaylist.SelectedIndex];
+                LoadRecentPlayList(filepath);
+            }
+            else
+            {
+                MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("Remove present playlist and load new one?", "Load Playlist", System.Windows.MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (messageBoxResult == MessageBoxResult.Yes)
+                {
+                    string filepath = listOldPlaylist[listboxOldPlaylist.SelectedIndex];
+                    LoadRecentPlayList(filepath);
+                }
+            }
+        }
+
         /*Playlist button*/
         private void ButtonAdd_Click(object sender, RoutedEventArgs e)
         {
@@ -383,10 +408,17 @@ namespace MP3_MusicPlayer
             screen.Multiselect = true;
             if (screen.ShowDialog() == true)
             {
-                foreach (var filename in screen.FileNames)
+                try
                 {
-                    var info = TagLib.File.Create(filename);
-                    _fullPaths.Add(info);
+                    foreach (var filename in screen.FileNames)
+                    {
+                        var info = TagLib.File.Create(filename);
+                        _fullPaths.Add(info);
+                    }
+                }
+                catch
+                {
+
                 }
             }
         }
@@ -399,7 +431,7 @@ namespace MP3_MusicPlayer
             foreach (var item in listViewPlaylist.SelectedItems)
             {
                 selecteds.Add(item);
-                if (_playingSong > -1 && item == listViewPlaylist.Items[_playingSong]) 
+                if (_playingSong > -1 && item == playedItem) 
                 {
                     isPlayingSongSelected = true;
                 }
@@ -417,6 +449,7 @@ namespace MP3_MusicPlayer
                     _lastPlayedSong = -1;
                     _playingSong = -1;
                     imageAnimation.Fill = new ImageBrush(defaultSongImage);
+                    Title = appName;
                     ButtonStop_Click(null, null);
                 }
             }
@@ -446,9 +479,19 @@ namespace MP3_MusicPlayer
             }
         }
 
-        private void SaveRecentPlayList()
+        private void SaveRecentPlayList(string filepath)
         {
-            string filename = "recent.txt";
+            string filename = filepath;
+            int tmpCount = -1;
+            foreach (var line in listViewPlaylist.Items)
+            {
+                tmpCount++;
+                if (line == playedItem)
+                {
+                    _playingSong = tmpCount;
+                    break;
+                }
+            }
 
             var writer = new StreamWriter(filename);
             writer.WriteLine(_playingSong);
@@ -459,14 +502,26 @@ namespace MP3_MusicPlayer
                 writer.WriteLine(path.Name);
             }
             writer.Close();
+
+            filename = "recentPlaylists.txt";
+            writer = new StreamWriter(filename);
+
+            foreach (var path in listOldPlaylist)
+            {
+                writer.WriteLine(path);
+            }
+            writer.Close();
         }
 
-        private void LoadRecentPlayList()
+        private void LoadRecentPlayList(string filepath)
         {
+            resetPlaylist();
+
             StreamReader reader;
+            //load audio of last playlist
             try
             {
-                reader = new StreamReader("recent.txt");
+                reader = new StreamReader(filepath);
                 // first line is the index last played music file
                 _playingSong = int.Parse(reader.ReadLine());
 
@@ -488,14 +543,35 @@ namespace MP3_MusicPlayer
                     Title = appName + $" : { shortname}";
                     loadAlbumCover(_playingSong);
                 }
+
+                //load all playlist has saved
+                try
+                {
+                    string[] lines = File.ReadAllLines("recentPlaylists.txt");
+                    foreach (var line in lines)
+                    {
+                        if (isDistinctPath(line))
+                            listOldPlaylist.Add(line);
+                    }
+
+                    listboxOldPlaylist.ItemsSource = listOldPlaylist;
+                }
+                catch (FileNotFoundException)
+                {
+
+                }
             }
             catch (FileNotFoundException)
             {
-                //System.Windows.MessageBox.Show(ex.Message, "File Not Found!");
-                var writer = new StreamWriter("recent.txt");
-                writer.Close();
-                return;
+                System.Windows.MessageBox.Show("File has no content or deleted!!!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                int tmpPos = -1;
+                for (int i = 0; i < listOldPlaylist.Count; i++)
+                    if (listOldPlaylist[i] == filepath)
+                        tmpPos = i;
+                if (tmpPos != -1)
+                    listOldPlaylist.RemoveAt(tmpPos);
             }
+
         }
 
         private void SliderSeeker_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -503,6 +579,16 @@ namespace MP3_MusicPlayer
             //int pos = Convert.ToInt32(sliderSeeker.Value);
             double pos = sliderSeeker.Value;
             _player.Position = TimeSpan.FromSeconds(pos);
+        }
+
+        private bool isDistinctPath(string filepath)
+        {
+
+            foreach (var path in listOldPlaylist)
+                if (filepath == path)
+                    return false;
+
+            return true;
         }
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
@@ -514,18 +600,15 @@ namespace MP3_MusicPlayer
                 if (screen.ShowDialog() == true)
                 {
                     string playlist = screen.FileName;
-                    var writer = new StreamWriter(playlist);
-                    foreach (var path in _fullPaths)
+
+                    if (isDistinctPath(playlist))
                     {
-                        writer.WriteLine(path);
+                        listOldPlaylist.Add(playlist);
+                        listboxOldPlaylist.ItemsSource = listOldPlaylist;
                     }
 
-                    writer.Close();
-                    //if (fileinfo.Exists)
-                    //{
-                    //    System.Windows.MessageBox.Show("Please specify a different filename", "Duplicate Filename Found");
-                    //}
-                    //else { }
+                    SaveRecentPlayList(playlist);
+                
                 }
             }
             else
@@ -540,6 +623,7 @@ namespace MP3_MusicPlayer
             _lastPlayedSong = -1;
             _playingSong = -1;
             imageAnimation.Fill = new ImageBrush(defaultSongImage);
+            Title = appName;
             ButtonStop_Click(null, null);
         }
 
@@ -556,6 +640,11 @@ namespace MP3_MusicPlayer
                     if (screen.ShowDialog() == true)
                     {
                         string playlist = screen.FileName;
+
+                        //add to quick playlist
+                        listOldPlaylist.Add(playlist);
+                        listboxOldPlaylist.ItemsSource = listOldPlaylist;
+
                         var reader = new StreamReader(playlist);
                         do
                         {
@@ -742,11 +831,6 @@ namespace MP3_MusicPlayer
         private void SaveCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ButtonSave_Click(buttonSave, null);
-        }
-
-        private void ListboxOldPlaylist_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
         }
     }
 }
