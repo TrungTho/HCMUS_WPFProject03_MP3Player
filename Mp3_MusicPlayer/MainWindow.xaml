@@ -72,6 +72,12 @@
     </Window.CommandBindings>
 
     <Canvas Name="mainCanvas" >
+        <Canvas.Resources>
+            <Style TargetType="Button">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+            </Style>
+        </Canvas.Resources>
         <Border Height="20" Width="794" BorderBrush="#FFACACAC" BorderThickness="0,0,0,1">
             <DockPanel Background="#FFDDDDDD" Margin="0,0,0,0.2">
                 <Menu DockPanel.Dock="Top">
@@ -243,7 +249,7 @@
 
         <Button Name="buttonSpeaker"  Canvas.Top="495.335" Canvas.Left="615" Background="Transparent"
                Width="30" Height="30" BorderBrush="Transparent" Click="ButtonSpeaker_Click">
-            <Image Name="imageSpeaker" Source="Images/speaker.png"/>
+            <Image Name="imageSpeaker" Source="Images/speaker.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </Button>
         <Slider Name="sliderVolume" Canvas.Left="650" Canvas.Top="500.001" Width="118" AutoToolTipPlacement="BottomRight"
                 Cursor="Hand" BorderThickness="1" Height="24" Maximum="100" Minimum="0"
@@ -258,12 +264,15 @@
                       ToolTip="Click to toggle between 'Loop all', 'Loop one' and 'No Loop'" IsThreeState="True"
                       IsChecked="{x:Null}" Checked="ButtonLoopMode_Checked" Unchecked="ButtonLoopMode_Unchecked"
                       Indeterminate="ButtonLoopMode_Indeterminate" Click="ButtonLoopMode_Click"
+                      Background="Transparent" BorderBrush="Transparent"
                       >
             <Image Name="btnLoopIcon" Source="Images/repeat_off.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </ToggleButton>
         <ToggleButton Name="buttonShuffle" Height="36" Width="auto" Canvas.Left="541" Canvas.Top="492"
                       Checked="ButtonShuffle_Checked" Unchecked="ButtonShuffle_Unchecked" IsChecked="False"
-                      ToolTip="Click to turn Random Mode On">
+                      ToolTip="Click to turn Random Mode On"
+                      Background="Transparent" BorderBrush="Transparent"
+                      >
             <Image Name="randomModeIcon" Source="Images/shuffle_off.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </ToggleButton>
 
