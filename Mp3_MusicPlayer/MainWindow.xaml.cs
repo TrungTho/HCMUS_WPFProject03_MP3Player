@@ -650,16 +650,27 @@ namespace MP3_MusicPlayer
                         listboxOldPlaylist.ItemsSource = listOldPlaylist;
 
                         var reader = new StreamReader(playlist);
-                        do
+                        _playingSong = int.Parse(reader.ReadLine());
+                        int nSongs = int.Parse(reader.ReadLine());
+                        for (int i = 0; i < nSongs; i++)
                         {
                             string line = reader.ReadLine();
-                            if (line == null) break;
                             var info = TagLib.File.Create(line);
                             if (info != null)
                             {
                                 _fullPaths.Add(info);
                             }
-                        } while (true);
+                        }
+                        //do
+                        //{
+                        //    string line = reader.ReadLine();
+                        //    if (line == null) break;
+                        //    var info = TagLib.File.Create(line);
+                        //    if (info != null)
+                        //    {
+                        //        _fullPaths.Add(info);
+                        //    }
+                        //} while (true);
                     }
                 }
             }
@@ -670,16 +681,27 @@ namespace MP3_MusicPlayer
                 {
                     string playlist = screen.FileName;
                     var reader = new StreamReader(playlist);
-                    do
+                    _playingSong = int.Parse(reader.ReadLine());
+                    int nSongs = int.Parse(reader.ReadLine());
+                    for (int i = 0; i < nSongs; i++)
                     {
                         string line = reader.ReadLine();
-                        if (line == null) break;
                         var info = TagLib.File.Create(line);
                         if (info != null)
                         {
                             _fullPaths.Add(info);
                         }
-                    } while (true);
+                    }
+                    //do
+                    //{
+                    //    string line = reader.ReadLine();
+                    //    if (line == null) break;
+                    //    var info = TagLib.File.Create(line);
+                    //    if (info != null)
+                    //    {
+                    //        _fullPaths.Add(info);
+                    //    }
+                    //} while (true);
                 }
             }
         }
@@ -706,9 +728,12 @@ namespace MP3_MusicPlayer
                 }
                 else
                 {
-                    if (_playingSong < 0)
-                        _playingSong = 0;
-                    PlaySelectedIndex(_playingSong);
+                    if (_fullPaths.Count > 0)
+                    {
+                        if (_playingSong < 0)
+                            _playingSong = 0;
+                        PlaySelectedIndex(_playingSong);
+                    }
                 }
                 resumeAnimation();
             }
