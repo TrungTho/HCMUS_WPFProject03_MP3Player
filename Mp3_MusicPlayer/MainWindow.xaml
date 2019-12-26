@@ -154,7 +154,7 @@
                     <TextBlock Grid.Column="1" Text="Save Playlist" />
                 </Grid>
             </Button>
-                
+
             <wpfx1:DropDownButton Name="buttonLoad" Width="auto" Height="35"
                                   Background="Transparent">
                 <Grid FlowDirection="LeftToRight">
@@ -221,9 +221,11 @@
             </ListView>
 
         </Border>
+
         <Slider Name="sliderSeeker" Canvas.Left="98" Canvas.Top="445" Width="663" Height="24" AutoToolTipPlacement="BottomRight"
                 Cursor="Hand" BorderThickness="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
                 UseLayoutRounding="True" ValueChanged="SliderSeeker_ValueChanged"/>
+
         <Label Name="labelDuration" Canvas.Left="86" Content="00:00 / 00:00" Canvas.Top="480" 
                BorderBrush="#FF908B8B" BorderThickness="1"/>
         <Button Name="buttonPrevious" Click="ButtonPrevious_Click"
@@ -238,13 +240,20 @@
                 Canvas.Left="373" Canvas.Top="480" FontSize="16">
             <Image Name="btnPlayIcon" Source="Images/play_1.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </Button>
-        <Slider Name="sliderVolume" Canvas.Left="643" Canvas.Top="492" Width="118" AutoToolTipPlacement="BottomRight"
-                Cursor="Hand" BorderThickness="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" 
-                UseLayoutRounding="True" Height="24"/>
+
+        <Button Name="buttonSpeaker"  Canvas.Top="495.335" Canvas.Left="615" Background="Transparent"
+               Width="30" Height="30" BorderBrush="Transparent" Click="ButtonSpeaker_Click">
+            <Image Name="imageSpeaker" Source="Images/speaker.png"/>
+        </Button>
+        <Slider Name="sliderVolume" Canvas.Left="650" Canvas.Top="500.001" Width="118" AutoToolTipPlacement="BottomRight"
+                Cursor="Hand" BorderThickness="1" Height="24" Maximum="100" Minimum="0"
+                ValueChanged="SliderVolume_ValueChanged" Value="50"/>
+
         <Button Name="buttonStop" Canvas.Left="255" Canvas.Top="490" Width="40" Height="auto"
                 FontSize="12" Click="ButtonStop_Click">
             <Image Source="Images/stop_1.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </Button>
+
         <ToggleButton Name="buttonLoopMode" Height="36" Width="auto" Canvas.Left="499" Canvas.Top="492"
                       ToolTip="Click to toggle between 'Loop all', 'Loop one' and 'No Loop'" IsThreeState="True"
                       IsChecked="{x:Null}" Checked="ButtonLoopMode_Checked" Unchecked="ButtonLoopMode_Unchecked"

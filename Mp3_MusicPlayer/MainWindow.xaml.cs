@@ -28,7 +28,6 @@ namespace MP3_MusicPlayer
     {
         const string appName = "MP3 Music Player";
         string[] loopModesHints = { "Loop: off", "Loop: one", "Loop: all"};
-        string currently = "Currently Playing: ";
         string[] kbShortcuts =
         {
             "Ctrl + N : Add file(s) to current playlist",
@@ -56,6 +55,7 @@ namespace MP3_MusicPlayer
         BitmapImage _playIcon;
         BitmapImage _pauseIcon;
         BitmapImage[] _loopModes;
+        BitmapImage[] _speaker;
         BitmapImage _randomOnIcon;
         BitmapImage _randomOffIcon;
         BitmapImage defaultSongImage;
@@ -92,19 +92,29 @@ namespace MP3_MusicPlayer
         /*UI function*/
         private void LoadImages()
         {
-            //button
-            _playIcon = new BitmapImage(new Uri("Images/play_1.png", UriKind.Relative));
-            _pauseIcon = new BitmapImage(new Uri("Images/pause_1.png", UriKind.Relative));
-            _loopModes = new BitmapImage[3];
-            _loopModes[0] = new BitmapImage(new Uri("Images/repeat_off.png", UriKind.Relative));
-            _loopModes[1] = new BitmapImage(new Uri("Images/repeat_one.png", UriKind.Relative));
-            _loopModes[2] = new BitmapImage(new Uri("Images/repeat_all.png", UriKind.Relative));
-            _randomOnIcon = new BitmapImage(new Uri("Images/shuffle_on.png", UriKind.Relative));
-            _randomOffIcon = new BitmapImage(new Uri("Images/shuffle_off.png", UriKind.Relative));
+            try
+            {
+                //button
+                _playIcon = new BitmapImage(new Uri("Images/play_1.png", UriKind.Relative));
+                _pauseIcon = new BitmapImage(new Uri("Images/pause_1.png", UriKind.Relative));
+                _loopModes = new BitmapImage[3];
+                _loopModes[0] = new BitmapImage(new Uri("Images/repeat_off.png", UriKind.Relative));
+                _loopModes[1] = new BitmapImage(new Uri("Images/repeat_one.png", UriKind.Relative));
+                _loopModes[2] = new BitmapImage(new Uri("Images/repeat_all.png", UriKind.Relative));
+                _speaker = new BitmapImage[2];
+                _speaker[0] = new BitmapImage(new Uri("Images/speaker.png", UriKind.Relative));
+                _speaker[1] = new BitmapImage(new Uri("Images/mutespeaker.png", UriKind.Relative));
+                _randomOnIcon = new BitmapImage(new Uri("Images/shuffle_on.png", UriKind.Relative));
+                _randomOffIcon = new BitmapImage(new Uri("Images/shuffle_off.png", UriKind.Relative));
 
-            //default song's image
-            defaultSongImage = new BitmapImage(new Uri("Images/appIcon.png", UriKind.Relative));
-            imageAnimation.Fill = new ImageBrush(defaultSongImage);
+                //default song's image
+                defaultSongImage = new BitmapImage(new Uri("Images/appIcon.png", UriKind.Relative));
+                imageAnimation.Fill = new ImageBrush(defaultSongImage);
+            }
+            catch
+            {
+                System.Windows.MessageBox.Show("Some images can not be found, make sure you put them in same folder of execute file!", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
 
         private void startAnimation()
@@ -574,13 +584,6 @@ namespace MP3_MusicPlayer
 
         }
 
-        private void SliderSeeker_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            //int pos = Convert.ToInt32(sliderSeeker.Value);
-            double pos = sliderSeeker.Value;
-            _player.Position = TimeSpan.FromSeconds(pos);
-        }
-
         private bool isDistinctPath(string filepath)
         {
 
@@ -778,6 +781,43 @@ namespace MP3_MusicPlayer
             _isRandomOrder = false;
             randomModeIcon.Source = _randomOffIcon;
             buttonShuffle.ToolTip = "Random: off";
+        }
+
+        private void SliderSeeker_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            //int pos = Convert.ToInt32(sliderSeeker.Value);
+            double pos = sliderSeeker.Value;
+            _player.Position = TimeSpan.FromSeconds(pos);
+        }
+
+        private double oldVolume = 50;
+        private void SliderVolume_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            _player.Volume = (double)sliderVolume.Value / (double)100;
+            if (_speaker != null)
+                if (sliderVolume.Value == 0)
+                {
+                    imageSpeaker.Source = _speaker[1];
+                }
+                else
+                {
+                    imageSpeaker.Source = _speaker[0];
+                }
+        }
+
+        private void ButtonSpeaker_Click(object sender, RoutedEventArgs e)
+        {
+            if (sliderVolume.Value == 0)
+            {
+                sliderVolume.Value = oldVolume;
+                imageSpeaker.Source = _speaker[0];
+            }
+            else
+            {
+                oldVolume = sliderVolume.Value;
+                sliderVolume.Value = 0;
+                imageSpeaker.Source = _speaker[1];
+            }
         }
 
         /*Menu button*/

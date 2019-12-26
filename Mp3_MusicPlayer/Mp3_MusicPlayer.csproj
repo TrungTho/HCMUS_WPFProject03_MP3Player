@@ -215,5 +215,9 @@
   <ItemGroup>
     <Resource Include="appicon_B0S_icon.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\mutespeaker.png" />
+    <Resource Include="Images\speaker.PNG" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
