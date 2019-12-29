@@ -364,7 +364,8 @@ namespace MP3_MusicPlayer
             }
             else
             {
-                SaveRecentPlayList("recent.txt");
+                if (_fullPaths.Count != 0)
+                    SaveRecentPlayList("recent.txt");
                 _hook.KeyUp -= KeyUp_hook;
                 _hook.Dispose();
             }
@@ -573,7 +574,7 @@ namespace MP3_MusicPlayer
             }
             catch (FileNotFoundException)
             {
-                System.Windows.MessageBox.Show("File has no content or deleted!!!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                //System.Windows.MessageBox.Show("File has no content or deleted!!!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 int tmpPos = -1;
                 for (int i = 0; i < listOldPlaylist.Count; i++)
                     if (listOldPlaylist[i] == filepath)

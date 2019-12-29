@@ -64,7 +64,7 @@
         </Style>
 
     </Window.Resources>
-
+    
     <Window.CommandBindings>
         <CommandBinding Command="Open" CanExecute="OpenCommand_CanExecute" Executed="OpenCommand_Executed" />
         <CommandBinding Command="Save" CanExecute="SaveCommand_CanExecute" Executed="SaveCommand_Executed" />
@@ -96,7 +96,7 @@
             </DockPanel>
         </Border>
 
-        <StackPanel Orientation="Vertical" Width="150" Canvas.Left="24" Canvas.Top="44" >
+        <StackPanel Orientation="Vertical" Width="150" Canvas.Left="24" Canvas.Top="39" >
             <StackPanel.Resources>
                 <Style TargetType="Button">
                     <Setter Property="Background" Value="Transparent"/>
@@ -205,15 +205,15 @@
         <!--<TextBlock Name="labelCurrentPlay" TextWrapping="Wrap" Text="Currently Playing" Width="auto" Canvas.Left="200" Canvas.Top="24"/>-->
 
         <Border Canvas.Left="196" Canvas.Top="44">
-            <ListView Name="listViewPlaylist" Width="680" Height="357" 
+            <ListView Name="listViewPlaylist" Width="650" Height="357" 
                       MouseDoubleClick="listBoxItemPlay_DoubleClick"
                       SelectionMode="Extended">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="Name" Width="250" DisplayMemberBinding="{Binding Name, Converter={StaticResource nameConverter}}" />
                         <GridViewColumn Header="Duration" Width="70" DisplayMemberBinding="{Binding Properties.Duration, Converter={StaticResource durationConverter}}" />
-                        <GridViewColumn Header="Artist" Width="130" DisplayMemberBinding="{Binding Tag.FirstPerformer}" />
-                        <GridViewColumn Header="Album" Width="110" DisplayMemberBinding="{Binding Tag.Album}" />
+                        <GridViewColumn Header="Artist" Width="140" DisplayMemberBinding="{Binding Tag.FirstPerformer}" />
+                        <GridViewColumn Header="Album" Width="140" DisplayMemberBinding="{Binding Tag.Album}" />
 
                     </GridView>
                 </ListView.View>
@@ -228,39 +228,39 @@
 
         </Border>
 
-        <Slider Name="sliderSeeker" Canvas.Left="98" Canvas.Top="445" Width="663" Height="24" AutoToolTipPlacement="BottomRight"
+        <Slider Name="sliderSeeker" Canvas.Left="98" Canvas.Top="445" Width="748" Height="24" AutoToolTipPlacement="BottomRight"
                 Cursor="Hand" BorderThickness="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
                 UseLayoutRounding="True" ValueChanged="SliderSeeker_ValueChanged"/>
 
-        <Label Name="labelDuration" Canvas.Left="86" Content="00:00 / 00:00" Canvas.Top="480" 
+        <Label Name="labelDuration" Canvas.Left="146" Content="00:00 / 00:00" Canvas.Top="480" 
                BorderBrush="#FF908B8B" BorderThickness="1"/>
         <Button Name="buttonPrevious" Click="ButtonPrevious_Click"
-                FontSize="10" Canvas.Left="326" Canvas.Top="490" Height="40" Width="auto">
+                FontSize="10" Canvas.Left="386" Canvas.Top="490" Height="40" Width="auto">
             <Image Source="Images/previous_1.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </Button>
         <Button Name="buttonNext" Click="ButtonNext_Click"
-                FontSize="10" Height="40" Canvas.Left="438" Canvas.Top="490" Width="auto">
+                FontSize="10" Height="40" Canvas.Left="498" Canvas.Top="490" Width="auto">
             <Image Source="Images/next_1.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </Button>
         <Button Name="buttonPlay" Width="60" Height="auto" Click="ButtonPlay_Click"
-                Canvas.Left="373" Canvas.Top="480" FontSize="16">
+                Canvas.Left="433" Canvas.Top="480" FontSize="16">
             <Image Name="btnPlayIcon" Source="Images/play_1.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </Button>
 
-        <Button Name="buttonSpeaker"  Canvas.Top="495.335" Canvas.Left="615" Background="Transparent"
+        <Button Name="buttonSpeaker"  Canvas.Top="495" Canvas.Left="675" Background="Transparent"
                Width="30" Height="30" BorderBrush="Transparent" Click="ButtonSpeaker_Click">
             <Image Name="imageSpeaker" Source="Images/speaker.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </Button>
-        <Slider Name="sliderVolume" Canvas.Left="650" Canvas.Top="500.001" Width="118" AutoToolTipPlacement="BottomRight"
+        <Slider Name="sliderVolume" Canvas.Left="710" Canvas.Top="500" Width="118" AutoToolTipPlacement="BottomRight"
                 Cursor="Hand" BorderThickness="1" Height="24" Maximum="100" Minimum="0"
                 ValueChanged="SliderVolume_ValueChanged" Value="50"/>
 
-        <Button Name="buttonStop" Canvas.Left="255" Canvas.Top="490" Width="40" Height="auto"
+        <Button Name="buttonStop" Canvas.Left="315" Canvas.Top="490" Width="40" Height="auto"
                 FontSize="12" Click="ButtonStop_Click">
             <Image Source="Images/stop_1.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </Button>
 
-        <ToggleButton Name="buttonLoopMode" Height="36" Width="auto" Canvas.Left="499" Canvas.Top="492"
+        <ToggleButton Name="buttonLoopMode" Height="36" Width="auto" Canvas.Left="559" Canvas.Top="492"
                       ToolTip="Click to toggle between 'Loop all', 'Loop one' and 'No Loop'" IsThreeState="True"
                       IsChecked="{x:Null}" Checked="ButtonLoopMode_Checked" Unchecked="ButtonLoopMode_Unchecked"
                       Indeterminate="ButtonLoopMode_Indeterminate" Click="ButtonLoopMode_Click"
@@ -268,7 +268,7 @@
                       >
             <Image Name="btnLoopIcon" Source="Images/repeat_off.png" RenderOptions.BitmapScalingMode="HighQuality"/>
         </ToggleButton>
-        <ToggleButton Name="buttonShuffle" Height="36" Width="auto" Canvas.Left="541" Canvas.Top="492"
+        <ToggleButton Name="buttonShuffle" Height="36" Width="auto" Canvas.Left="601" Canvas.Top="492"
                       Checked="ButtonShuffle_Checked" Unchecked="ButtonShuffle_Unchecked" IsChecked="False"
                       ToolTip="Click to turn Random Mode On"
                       Background="Transparent" BorderBrush="Transparent"
